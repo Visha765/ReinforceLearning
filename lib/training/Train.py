@@ -16,9 +16,6 @@ def Train(env, agent, start_step, end_step, seed, save_interval, path):
   #   env, agent, current_step, info = agent.load_models(path, files[-1])
   
   for t in tqdm(range(start_step, end_step)):
-    # env.render()
-    action = agent.select_exploratory_action(state)
-    next_state, reward, done, info = env.step(action)
     
     ## save model per interval
     if (t % save_interval == 0 and t!= 0):
@@ -29,12 +26,15 @@ def Train(env, agent, start_step, end_step, seed, save_interval, path):
                         path=path
                       )
       
+    # env.render()
+    action = agent.select_exploratory_action(state)
+    next_state, reward, done, info = env.step(action)
     agent.train(state, action, next_state, reward, done)
     state = next_state
     if done:
       state = env.reset()
 
-
+  ## save model
   agent.save_models(env=env,
                     current_step=end_step, 
                     seed=seed, 

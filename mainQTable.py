@@ -35,7 +35,7 @@ def main():
     env.seed(train_seed)
     env.action_space.seed(train_seed)
     np.random.seed(train_seed)
-    agent = QTableAgent(env, K, L)
+    agent = QTableAgent(K, L)
     start_step = 0
     
     # load model if exists
@@ -55,7 +55,7 @@ def main():
     for file in files:
         env = gym.make(env_name)
         env.seed(eval_seed)
-        # agent = QTableAgent(env, K, L)
+        # agent = QTableAgent(K, L)
         _, agent, _ = agent.load_models(path=path, filename=file)
         
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)

@@ -7,15 +7,15 @@ from lib.training.Evaluation import Evaluation
 from lib.util.fetchPikle import fetch_pikles
 # from lib.util.boxplot import BoxPlot
 from lib.util.linePlot import LinePlot
-from lib.model.tableQAgent import TableQAgent
+from lib.model.qTableAgent import QTableAgent
 
 def main():
 
     env_name = 'Pendulum-v0'
         
-    train_step = 1000 # 1000
+    train_step = 10000 # 1000
     train_seed = 82
-    interval = 100
+    interval = 1000
     K, L = 10, 9
     
     episode = 10 # 10
@@ -35,7 +35,7 @@ def main():
     env.seed(train_seed)
     env.action_space.seed(train_seed)
     np.random.seed(train_seed)
-    agent = TableQAgent(env, K, L)
+    agent = QTableAgent(env, K, L)
     start_step = 0
     
     # load model if exists
@@ -55,7 +55,7 @@ def main():
     for file in files:
         env = gym.make(env_name)
         env.seed(eval_seed)
-        agent = TableQAgent(env, K, L)
+        # agent = QTableAgent(env, K, L)
         _, agent, _ = agent.load_models(path=path, filename=file)
         
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
@@ -69,3 +69,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

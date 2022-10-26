@@ -1,36 +1,41 @@
+import numpy as np
 import sys, os
-import glob
-import re
 import gym
 
 from lib.training.Train import Train
 from lib.training.Evaluation import Evaluation
 from lib.util.fetchPikle import fetch_pikles
-from lib.util.boxplot import BoxPlot
+# from lib.util.boxplot import BoxPlot
+from lib.util.linePlot import LinePlot
 from lib.model.randomAgent import RandomAgent
 
 def main():
 
     env_name = 'Pendulum-v0'
         
-    train_step = 1000 # 1000
-    train_seed = 114514
-    interval = 100
+    train_step = 10000 # 1000
+    train_seed = 82
+    interval = 1000
+    K, L = 10, 9
     
     episode = 10 # 10
     eval_step = 1000
-    eval_seed = 810
+    eval_seed = 41
     
-    path=f"data/{env_name}"
+    
+    path=f"data/{env_name}_seed{train_seed}"
     if not os.path.exists(path):
         os.mkdir(path)
         
         
     ### Train ###
+    print('-'*10, "start Train", '-'*10)
+    
     env = gym.make(env_name)
     env.seed(train_seed)
     env.action_space.seed(train_seed)
-    agent = RandomAgent(env)
+    np.random.seed(train_seed)
+    agent = RandomAgent(env, K, L)
     start_step = 0
     
     # load model if exists
@@ -43,19 +48,24 @@ def main():
     
     
     ### Evaluation ###
+    print('-'*10, "start Evaluation", '-'*10)
+    
     saved_steps, files = fetch_pikles(path)
     data_list = []
     for file in files:
         env = gym.make(env_name)
         env.seed(eval_seed)
-        agent = RandomAgent(env)
+        agent = RandomAgent(env, K, L)
         _, agent, _ = agent.load_models(path=path, filename=file)
         
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
         
         data_list.append(rewards)
-    BoxPlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
-    print(data_list)
+        print(rewards)
+        
+        
+    ### Visualize ###
+    LinePlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
 
 if __name__ == '__main__':
     main()

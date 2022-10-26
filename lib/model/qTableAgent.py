@@ -1,14 +1,12 @@
 from random import uniform
-from select import select
 import sys, os
 import pickle
-from charset_normalizer import from_path
 import numpy as np
-from ..model.agent import Agent
+from .agent import Agent
 
 from ..util.table import *
 
-class TableQAgent(Agent):
+class QTableAgent(Agent):
   
   def __init__(self, env, K, L):
     self.env = env;

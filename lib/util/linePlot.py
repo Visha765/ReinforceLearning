@@ -9,9 +9,10 @@ def LinePlot(data_list ,label_list, env_name, seed, path):
   f = [np.percentile(data, q=[25,50, 75]) for data in data_list]
   f = np.array(f).T
 
-  plt.plot(label_list, f[0], label="25%")
-  plt.plot(label_list, f[1], label="50%", color="blue", marker='x')
   plt.plot(label_list, f[2], label="75%")
+  plt.plot(label_list, f[1], label="50%", color="blue", marker='x')
+  plt.plot(label_list, f[0], label="25%")
+  
   plt.fill_between(label_list, f[0], f[2], color="green", alpha=0.3)
   
   title = f"{env_name}_seed{seed}_step{label_list[-1]}"
@@ -21,6 +22,6 @@ def LinePlot(data_list ,label_list, env_name, seed, path):
   # plt.tick_params(labelsize=8)
   plt.grid(True)
   plt.legend(loc="upper right", fontsize=12)
-  plt.show()
   
   plt.savefig(os.path.join(path,title)+'.png', format="png")
+  plt.show()

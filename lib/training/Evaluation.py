@@ -6,11 +6,7 @@ from ..model.agent import Agent
 
 
 def Evaluation(env, agent, max_step: int, episode: int, seed: int):
-  
-  # env = gym.make(env_name)
-  # env.seed(seed)
-  # agent = Agent(env)
-  # _, agent0, _, _ = agent.load_models(path=path, filename=filename)
+
   rewards = []
 
   for it in range(episode):

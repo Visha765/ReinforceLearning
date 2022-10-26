@@ -1,5 +1,7 @@
 data
 experiment
 # __pycache__
-lib.*.__pycache__
+lib.model.__pycache__
+lib.training.__pycache__
+lib.util.__pycache__
 tmp.py

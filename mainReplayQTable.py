@@ -7,7 +7,7 @@ from lib.training.Train import Train
 from lib.training.Evaluation import Evaluation
 from lib.util.fetchPikle import fetch_pikles
 from lib.util.linePlot import LinePlot
-from lib.model.qTableAgent import QTableAgent
+from lib.model.replayQTableAgent import ReplayQTableAgent
 
 def main():
 
@@ -15,8 +15,10 @@ def main():
         
     train_step = 10000 # 1000
     train_seed = 822
-    interval = 1000
-    K, L = 10, 9
+    interval = 100
+    K, L = 20, 18
+    buffer_size = train_step
+    batch_size = 64
     
     episode = 10 # 10
     eval_step = 1000
@@ -36,7 +38,7 @@ def main():
     env.action_space.seed(train_seed)
     random.seed(train_seed)
     # np.random.seed(train_seed)
-    agent = QTableAgent(K, L)
+    agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
     start_step = 0
     
     # load model if exists
@@ -47,6 +49,8 @@ def main():
     Train(env=env, agent=agent, start_step=start_step, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
     env.close()
     
+    print(agent.qTable)
+    
     
     ### Evaluation ###
     print('-'*10, "start Evaluation", '-'*10)
@@ -56,7 +60,6 @@ def main():
     for file in files:
         env = gym.make(env_name)
         env.seed(eval_seed)
-        # agent = QTableAgent(K, L)
         _, agent, _ = agent.load_models(path=path, filename=file)
         
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)

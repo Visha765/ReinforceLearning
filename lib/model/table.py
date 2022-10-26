@@ -7,6 +7,9 @@ class QTable():
   
   
   def __init__(self, K :int ,L :int):
+    self.gamma = 0.99
+    self.alpha = 3*1e-4
+    
     # obs = env.observation_space
     bin_theta = np.linspace(0-self.EPS, 360, K+1) 
     bin_omega = np.linspace(-8-self.EPS, 8, K+1)
@@ -26,14 +29,12 @@ class QTable():
     self.table = pd.DataFrame(1e-8*np.random.normal(size=(K*K, L)), index=index_0, columns=index_1)
 
 
-  def update_Qtable(self, state, action, reward, next_state):
-    gamma = 0.99
-    alpha = 3*1e-4
-    
+  def update_Qtable(self, state, action, reward, next_state, done=0):
     state = self.xy2theta(state)
     next_state = self.xy2theta(next_state)
     next_Max_Q = self.table.loc[next_state, :].max()
-    self.table.loc[state, action] = (1-alpha) * self.table.loc[state, action] + alpha * (reward + gamma * next_Max_Q)
+    self.table.loc[state, action] = (1-self.alpha) * self.table.loc[state, action] \
+      + self.alpha * (reward + (1 - done) * self.gamma * next_Max_Q)
     
     
   # return action of Max.Q

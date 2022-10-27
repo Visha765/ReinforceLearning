@@ -25,7 +25,7 @@ def main():
     eval_seed = 41
     
     
-    path=f"data/{env_name}_seed{train_seed}"
+    path=f"out/{env_name}_seed{train_seed}"
     if not os.path.exists(path):
         os.mkdir(path)
         

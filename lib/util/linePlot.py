@@ -10,7 +10,7 @@ def LinePlot(data_list ,label_list, env_name, seed, path):
   f = np.array(f).T
 
   plt.plot(label_list, f[2], label="75%")
-  plt.plot(label_list, f[1], label="50%", color="blue", marker='x')
+  plt.plot(label_list, f[1], label="50%", color="blue")
   plt.plot(label_list, f[0], label="25%")
   
   plt.fill_between(label_list, f[0], f[2], color="green", alpha=0.3)

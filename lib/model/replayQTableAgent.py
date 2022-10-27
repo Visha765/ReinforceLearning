@@ -1,11 +1,4 @@
-import numpy as np
-import sys, os
-import pickle
-import random
-
-from .agent import Agent
 from .qTableAgent import QTableAgent
-from .table import QTable
 from .replayBuffer import ReplayBuffer
 
 class ReplayQTableAgent(QTableAgent):

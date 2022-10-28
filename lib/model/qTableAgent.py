@@ -38,7 +38,7 @@ class QTableAgent(Agent):
     if self.epsilon < np.random.uniform(0,1):
       return self.select_action(state)
     else:
-      return np.random.choice(self.qTable.get_actions(state), 1)
+      return np.random.choice(self.qTable.actions, 1)
         
 
   def train(self, state, action, next_state, reward, done):

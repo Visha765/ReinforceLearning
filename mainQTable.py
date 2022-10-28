@@ -1,6 +1,5 @@
 import numpy as np
 import sys, os
-import random
 import gym
 
 from lib.training.Train import Train
@@ -13,8 +12,8 @@ def main():
 
     env_name = 'Pendulum-v0'
         
-    train_step = 10000 # 1000
-    train_seed = 822
+    train_step = 100000 # 1000
+    train_seed = 8243
     interval = 1000
     K, L = 10, 9
     
@@ -34,12 +33,11 @@ def main():
     env = gym.make(env_name)
     env.seed(train_seed)
     env.action_space.seed(train_seed)
-    random.seed(train_seed)
-    # np.random.seed(train_seed)
+    np.random.seed(train_seed)
     agent = QTableAgent(K, L)
     start_step = 0
     
-    # load model if exists
+    ## load model if exists ##
     saved_steps, files = fetch_pikles(path)
     if len(saved_steps)!=0: # none savedata
         env, agent, start_step = agent.load_models(path, files[-1]) # load latest savedata 
@@ -62,7 +60,7 @@ def main():
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
         
         data_list.append(rewards)
-        print(rewards)
+        print(np.mean(rewards))
         
         
     ### Visualize ###

@@ -34,13 +34,4 @@ def Train(env, agent, start_step, end_step, seed, save_interval, path):
                         path=path
                       )
 
-  # ## save model
-  # agent.save_models(env=env,
-  #                   current_step=end_step, 
-  #                   seed=seed, 
-  #                   # info=info, 
-  #                   path=path
-  #                 )
-  # env.close()
-
   return agent

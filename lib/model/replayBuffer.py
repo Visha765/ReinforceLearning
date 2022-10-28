@@ -15,13 +15,10 @@ class ReplayBuffer():
     # if len(self.que) >= batch_size:
     size = min(len(self.que), batch_size)
     
-    exp_list = random.sample(self.que, size)
-    return exp_list
+    # exp_list = random.sample(self.que, size)
+    rand_nums = np.random.choice(len(self.que), size, replace=False)
+    return [self.que[i] for i in rand_nums]
     
-    # que0 = copy.deepcopy(self.que)
-    # shuffle_que = random.shuffle(que0)
-    # print(type(self.que), self.que)
-    # print(type(que0), que0)
+    # exp_list = np.random.choice(self.que, size, replace=False)
+    # return exp_list
     
-    # shuffle_que = random.sample(self.que, )
-    # return [que0[i] for i in range(size)]

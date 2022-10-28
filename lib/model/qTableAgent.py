@@ -1,24 +1,21 @@
 import numpy as np
-import random
 import sys, os
 import pickle
 
 from .agent import Agent
-from .table import QTable
+from .qTable import QTable
 
 class QTableAgent(Agent):
   def __init__(self, K, L):
     self.epsilon = 0.05
     self.qTable = QTable(K, L)
-    
-    
+        
     
   def save_models(self, env, current_step, seed, path):
     print('saved step:', current_step)
     data = {'env': env, 
             'agent': self, 
             'saved_step': current_step,
-            # 'current_episode': current_episode,
             'seed': seed,
             # 'info': info
           }
@@ -34,14 +31,14 @@ class QTableAgent(Agent):
 
   # PI
   def select_action(self, state):
-    return self.qTable.get_maxQ_action(state)
+    return [self.qTable.get_maxQ_action(state)]
   
   # beta
   def select_exploratory_action(self, state):
-    if self.epsilon < random.uniform(0,1):
+    if self.epsilon < np.random.uniform(0,1):
       return self.select_action(state)
     else:
-      return random.sample(self.qTable.get_actions(state), 1)
+      return np.random.choice(self.qTable.get_actions(state), 1)
         
 
   def train(self, state, action, next_state, reward, done):

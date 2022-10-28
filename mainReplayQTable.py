@@ -13,16 +13,16 @@ def main():
 
     env_name = 'Pendulum-v0'
         
-    train_step = 10000 # 1000
-    train_seed = 822
-    interval = 100
-    K, L = 20, 18
+    train_step = 100000 # 1000
+    train_seed = 114
+    interval = 1000
+    K, L = 10, 9
     buffer_size = train_step
-    batch_size = 64
+    batch_size = 256
     
     episode = 10 # 10
     eval_step = 1000
-    eval_seed = 41
+    eval_seed = 514
     
     
     path=f"out/{env_name}_seed{train_seed}"
@@ -37,7 +37,7 @@ def main():
     env.seed(train_seed)
     env.action_space.seed(train_seed)
     random.seed(train_seed)
-    # np.random.seed(train_seed)
+    np.random.seed(train_seed)
     agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
     start_step = 0
     
@@ -48,8 +48,6 @@ def main():
     
     Train(env=env, agent=agent, start_step=start_step, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
     env.close()
-    
-    print(agent.qTable)
     
     
     ### Evaluation ###
@@ -65,7 +63,7 @@ def main():
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
         
         data_list.append(rewards)
-        print(rewards)
+        print(np.mean(rewards))
         
         
     ### Visualize ###

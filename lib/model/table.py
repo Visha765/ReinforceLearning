@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 class QTable():
-  EPS = 1e-12
+  EPS = 1e-15
   
   
   def __init__(self, K :int ,L :int):
@@ -11,7 +11,7 @@ class QTable():
     self.alpha = 3*1e-4
     
     # obs = env.observation_space
-    bin_theta = np.linspace(0-self.EPS, 360, K+1) 
+    bin_theta = np.linspace(-np.pi-self.EPS, np.pi, K+1) 
     bin_omega = np.linspace(-8-self.EPS, 8, K+1)
     bin_tau = np.linspace(-2-self.EPS, 2, L+1)
     
@@ -40,6 +40,7 @@ class QTable():
   # return action of Max.Q
   def get_maxQ_action(self, state):
     state = self.xy2theta(state)
+    # print(state)
     return [self.table.loc[state, :].idxmax().mid]
 
 
@@ -50,4 +51,6 @@ class QTable():
   
     # state: (cos(theta), sin(theta), omega) --> (theta, omega)
   def xy2theta(self, state):
-    return (np.arccos(state[0]), state[2])
+    cos, sin = state[0:2]
+    theta = np.arccos(cos) if sin > 0 else -np.arccos(cos)
+    return (theta, state[2])

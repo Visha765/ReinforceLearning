@@ -13,11 +13,9 @@ class QTableAgent(Agent):
     
   def save_models(self, env, current_step, seed, path):
     print('saved step:', current_step)
-    data = {'env': env, 
+    data = {
             'agent': self, 
             'saved_step': current_step,
-            'seed': seed,
-            # 'info': info
           }
     filename = f"log_{env.unwrapped.spec.id}_seed{seed}_step{current_step}.pikle"
     with open(os.path.join(path, filename), 'wb') as f:
@@ -27,7 +25,7 @@ class QTableAgent(Agent):
   def load_models(self, path, filename):
     with open(os.path.join(path, filename), 'rb') as f:
       data = pickle.load(f)
-    return (data[key] for key in ('env', 'agent', 'saved_step'))
+    return (data[key] for key in ('agent', 'saved_step'))
 
   # PI
   def select_action(self, state):

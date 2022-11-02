@@ -15,7 +15,7 @@ def main():
         
     train_step = 500000 
     train_seed = 11
-    interval = 1000
+    interval = 10000
     K, L = 10, 9
     buffer_size = train_step
     batch_size = 256

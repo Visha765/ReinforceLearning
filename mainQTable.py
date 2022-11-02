@@ -14,7 +14,7 @@ def main():
     env_name = 'Pendulum-v0'
         
     train_step = 500000
-    train_seed = 11
+    train_seed = 13
     interval = 10000
     K, L = 10, 9
     

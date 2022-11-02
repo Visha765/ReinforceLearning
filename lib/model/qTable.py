@@ -23,7 +23,7 @@ class QTable():
     self.table= 1e-8 * np.random.normal(0, 1, size=(K*K, L))
     
     
-      # state: (cos(theta), sin(theta), omega) --> (theta, omega)
+  # state: (cos(theta), sin(theta), omega) --> (theta, omega)
   def xy2theta(self, state):
     cos, sin = state[0:2]
     theta = np.arccos(cos) if sin > 0 else -np.arccos(cos)
@@ -56,14 +56,3 @@ class QTable():
     idx_state = self.digitize_state(state)
     idx_action = np.argmax(self.table[idx_state])
     return self.actions[idx_action]
-    # return np.mean(self.bin_tau[idx:idx+2])
-
-
-  # #return actions
-  # def get_actions(self):
-  #   # idx_state = self.digitize_state(state)
-  #   a = np.linspace(-2, 2, self.L+1)
-  #   return [(a[i]+a[i+1])/2 for i in range(self.L)]
-  #   # return [np.mean(self.bin_tau[idx:idx+2]) for idx in range(self.L)]
-  
-  

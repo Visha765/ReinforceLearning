@@ -39,9 +39,9 @@ def main():
     start_step = 0
     
     # load model if exists
-    saved_steps, files = fetch_pikles(path)
-    if len(saved_steps)!=0: # none savedata
-        env, agent, start_step = agent.load_models(path, files[-1]) # load latest savedata 
+    # saved_steps, files = fetch_pikles(path)
+    # if len(saved_steps)!=0: # none savedata
+    #     env, agent, start_step = agent.load_models(path, files[-1]) # load latest savedata 
     
     Train(env=env, agent=agent, start_step=start_step, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
     env.close()

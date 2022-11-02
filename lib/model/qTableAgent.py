@@ -12,7 +12,7 @@ class QTableAgent(Agent):
         
     
   def save_models(self, env, current_step, seed, path):
-    print('saved step:', current_step)
+    # print('saved step:', current_step)
     data = {
             'agent': self, 
             'saved_step': current_step,

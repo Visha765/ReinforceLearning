@@ -2,7 +2,7 @@ from collections import deque
 import numpy as np
 
 class ReplayBuffer():
-  def __init__(self, buffer_size):
+  def __init__(self, buffer_size: int):
     self.que = deque([], buffer_size)
   
   def add(self, state, action, next_state, reward, done):

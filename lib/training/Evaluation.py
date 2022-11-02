@@ -12,7 +12,6 @@ def Evaluation(env, agent, max_step: int, episode: int, seed: int):
   for it in range(episode):
     state = env.reset()
     sum_reward = 0
-    # for t in tqdm(range(max_step)):
     for t in range(max_step):
       # env.render()
       action = agent.select_action(state)

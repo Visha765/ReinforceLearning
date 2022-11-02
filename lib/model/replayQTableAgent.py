@@ -7,13 +7,12 @@ from .replayBuffer import ReplayBuffer
 class ReplayQTableAgent(QTableAgent):
   
   def __init__(self, K, L, buffer_size, batch_size):
-    
     super().__init__(K, L)
     self.buffer = ReplayBuffer(buffer_size)
     self.batch_size = batch_size
     
   def save_models(self, env, current_step, seed, path):
-    print('saved step:', current_step)
+    # print('saved step:', current_step)
     data = {
             'agent': copy.deepcopy(self), 
             'saved_step': current_step,

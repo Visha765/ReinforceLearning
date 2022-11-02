@@ -1,10 +1,9 @@
-from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
 def LinePlot(data_list ,label_list, env_name, seed, path):
-  plt.rcParams['font.family'] = 'Hiragino Sans'
+  plt.rcParams['font.family'] = 'Noto Sans JP', 'Hiragino Sans'
   
   f = [np.percentile(data, q=[25,50, 75]) for data in data_list]
   f = np.array(f).T
@@ -23,4 +22,4 @@ def LinePlot(data_list ,label_list, env_name, seed, path):
   plt.legend(loc="upper right", fontsize=12)
   
   plt.savefig(os.path.join(path,title)+'.png', format="png")
-  plt.show()
+  # plt.show()

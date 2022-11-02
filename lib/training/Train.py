@@ -1,10 +1,10 @@
 from tqdm import tqdm
 import gym
 
-def Train(env, agent, start_step, end_step, seed, save_interval, path):
+def Train(env, agent, end_step, seed, save_interval, path):
   state = env.reset()
   
-  for t in tqdm(range(start_step, end_step)):
+  for t in tqdm(range(end_step)):
       
     # env.render()
     action = agent.select_exploratory_action(state)

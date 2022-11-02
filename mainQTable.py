@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 import numpy as np
 import sys, os
 import time, datetime
@@ -9,19 +10,23 @@ from lib.util.fetchPikle import fetch_pikles
 from lib.util.linePlot import LinePlot
 from lib.model.qTableAgent import QTableAgent
 
-def main():
 
-    env_name = 'Pendulum-v0'
-        
-    train_step = 500000
-    train_seed = 13
-    interval = 10000
-    K, L = 10, 9
+### Condition ###
+env_name = 'Pendulum-v0'
     
-    episode = 10 # 10
-    eval_step = 10000
-    eval_seed = 0
-        
+train_step = 5000
+train_seeds = [11, 13, 17, 19, 23]
+interval = 1000
+K, L = 10, 9
+
+episode = 10 # 10
+eval_step = 10000
+eval_seed = 0
+    
+
+def thread(train_seed):
+    print(train_seed)
+
     ### Train ###
     print('-'*10, "start Train", '-'*10)
     
@@ -29,19 +34,14 @@ def main():
     env.seed(train_seed)
     np.random.seed(train_seed)
     agent = QTableAgent(K, L)
-    start_step = 0
     
     path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
     if not os.path.exists(path):
         os.mkdir(path)
-    
-    ## load model if exists ##
-    # saved_steps, files = fetch_pikles(path)
-    # if len(saved_steps)!=0: # none savedata
-    #     agent, start_step = agent.load_models(path, files[-1]) # load latest savedata 
+
     
     start = time.time()
-    Train(env=env, agent=agent, start_step=start_step, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
+    Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
     elapsed_time = time.time() - start
     print ("elapsed_time:{0}".format(datetime.timedelta(seconds=elapsed_time)))
     env.close()
@@ -67,6 +67,16 @@ def main():
     ### Visualize ###
     LinePlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
 
+
+# def thread_wrapper(args):
+#     return thread(*args)
+
+
+def main():
+    p = Pool(len(train_seeds))
+    p.map(thread, train_seeds)
+    p.close()
+    
 if __name__ == '__main__':
     main()
     

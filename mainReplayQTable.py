@@ -15,9 +15,9 @@ from lib.model.replayQTableAgent import ReplayQTableAgent
 env_name = 'Pendulum-v0'
 
 train_seeds = [11, 13, 17, 19, 23]    
-train_step = 500000 #500000 
-interval = 10000
-K, L = 10, 9
+train_step = 10000 #500000 
+interval = 1000
+K, L = 20, 18
 buffer_size = train_step
 batch_size = 256
 
@@ -37,6 +37,8 @@ def thread(train_seed):
     agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
 
     path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
+    if not os.path.exists('out'):
+        os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
     

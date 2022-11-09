@@ -1,7 +1,4 @@
-from typing import List
-import gym
 import numpy as np
-import pandas as pd
 
 class QTable():
   
@@ -9,13 +6,16 @@ class QTable():
     self.gamma = 0.99
     self.alpha = 3*1e-4
     
+    theta = (-np.pi, np.pi)
+    omega = (-8, 8)
+    tau = (-2, 2)
+    
     self.K = K
     self.L = L
     
-    # obs = env.observation_space
-    self.bin_theta = np.linspace(-np.pi, np.pi, self.K+1)[1:-1]
-    self.bin_omega = np.linspace(-8, 8, self.K+1)[1:-1]
-    self.bin_tau = np.linspace(-2, 2, self.L+1)[1:-1]
+    self.bin_theta = np.linspace(*theta, self.K+1)[1:-1]
+    self.bin_omega = np.linspace(*omega, self.K+1)[1:-1]
+    self.bin_tau = np.linspace(*tau, self.L+1)[1:-1]
     
     a = np.linspace(-2, 2, self.L+1)
     self.actions = [(a[i]+a[i+1])/2 for i in range(self.L)]

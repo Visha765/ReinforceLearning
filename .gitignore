@@ -1,0 +1,9 @@
+out
+experiment
+data
+# __pycache__
+lib.model.__pycache__
+lib.training.__pycache__
+lib.util.__pycache__
+*/.DS_Store
+tmp.py

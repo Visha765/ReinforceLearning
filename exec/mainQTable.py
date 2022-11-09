@@ -4,28 +4,26 @@ import sys, os
 import time, datetime
 import gym
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from lib.training.Train import Train
 from lib.training.Evaluation import Evaluation
 from lib.util.fetchPikle import fetch_pikles
 from lib.util.linePlot import LinePlot
-from lib.model.replayQTableAgent import ReplayQTableAgent
+from lib.model.qTableAgent import QTableAgent
 
 
 ### Condition ###
 env_name = 'Pendulum-v0'
-
-train_seeds = [11, 13, 17, 19, 23]    
-train_step = 10000 #500000 
+    
+train_step = 5000
+train_seeds = [11, 13, 17, 19, 23]
 interval = 1000
-K, L = 20, 18
-buffer_size = train_step
-batch_size = 256
+K, L = 10, 9
 
-eval_seed = 0
 episode = 10 # 10
 eval_step = 10000
-
-
+eval_seed = 0
+    
 
 def thread(train_seed):
     ### Train ###
@@ -34,13 +32,14 @@ def thread(train_seed):
     env = gym.make(env_name)
     env.seed(train_seed)
     np.random.seed(train_seed)
-    agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
-
+    agent = QTableAgent(K, L)
+    
     path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
+
     
     start = time.time()
     Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
@@ -70,11 +69,15 @@ def thread(train_seed):
     LinePlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
 
 
+# def thread_wrapper(args):
+#     return thread(*args)
+
+
 def main():
     p = Pool(len(train_seeds))
     p.map(thread, train_seeds)
     p.close()
-
+    
 if __name__ == '__main__':
     main()
     

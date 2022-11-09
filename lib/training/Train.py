@@ -1,5 +1,4 @@
 from tqdm import tqdm
-import gym
 
 def Train(env, agent, end_step, seed, save_interval, path):
   state = env.reset()
@@ -16,11 +15,6 @@ def Train(env, agent, end_step, seed, save_interval, path):
         
     ## save model per interval
     if ((t+1) % save_interval == 0 and (t+1) != 0):
-      agent.save_models(
-                        env=env,
-                        current_step=t+1, 
-                        seed=seed, 
-                        path=path
-                      )
+      agent.save_models(env=env, current_step=t+1, seed=seed, path=path)
 
   return agent

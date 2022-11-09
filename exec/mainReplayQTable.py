@@ -1,7 +1,6 @@
 from multiprocessing import Pool
 import numpy as np
 import sys, os
-import time, datetime
 import gym
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -36,16 +35,13 @@ def thread(train_seed):
     np.random.seed(train_seed)
     agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
 
-    path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
+    path=f"out/{agent.__class__.__name__}_seed{train_seed}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
     
-    start = time.time()
     Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
-    elapsed_time = time.time() - start
-    print ("elapsed_time:{0}".format(datetime.timedelta(seconds=elapsed_time)))
     env.close()
     
     

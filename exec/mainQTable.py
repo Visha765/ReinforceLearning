@@ -1,7 +1,6 @@
 from multiprocessing import Pool
 import numpy as np
 import sys, os
-import time, datetime
 import gym
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -15,9 +14,9 @@ from lib.model.qTableAgent import QTableAgent
 ### Condition ###
 env_name = 'Pendulum-v0'
     
-train_step = 5000
-train_seeds = [11]
-interval = 1000
+train_step = 500000
+train_seeds = [11, 13, 17, 19, 23]
+interval = 10000
 K, L = 10, 9
 
 episode = 10 # 10
@@ -33,18 +32,13 @@ def thread(train_seed):
     env.seed(train_seed)
     np.random.seed(train_seed)
     agent = QTableAgent(K, L)
-    
     path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
 
-    
-    start = time.time()
     Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
-    elapsed_time = time.time() - start
-    print ("elapsed_time:{0}".format(datetime.timedelta(seconds=elapsed_time)))
     env.close()
     
     
@@ -57,20 +51,13 @@ def thread(train_seed):
         env = gym.make(env_name)
         env.seed(eval_seed)
         agent, _ = agent.load_models(path=path, filename=file)
-        
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
-        
         data_list.append(rewards)
         print(np.mean(rewards))
         env.close()
         
-        
     ### Visualize ###
     LinePlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
-
-
-# def thread_wrapper(args):
-#     return thread(*args)
 
 
 def main():

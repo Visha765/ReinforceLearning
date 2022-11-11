@@ -128,7 +128,7 @@ $a_{\arg\max_{1\leq j\leq L} Q_{[\mathtt{idx}_s(s), j]}}$
 \lstinputlisting[caption = qTable.py ,label = qTable]{lib/model/qTable.py}
 
 
-\subsubsection{qTableAgent} \label{seq:qTableAgent}
+\subsubsection{qTableAgent.py} \label{seq:qTableAgent}
 \srcref{qTableAgent}に示すqTableAgent.pyでは、テーブルQ学習を行うエージェントをクラスQTableAgentとして実装した。
 \par
 まず、5-23行目に示すコンストラクタでは、
@@ -150,10 +150,39 @@ pathが示すディレクトリから該当するファイル名のpickleファ�
 27-31行目の関数select\_exploratory\_actionは、行動方策$\beta$を求める関数であり、
 \matref{Qbeta}に基づいて、同様に次のステップの行動を返す。
 \par
-そして、33-34行目の関数trainでは、
+そして、33-34行目の関数trainはエージェントの学習を行う関数であり、
 テーブルqTableのメソッドupdate\_actionを利用し、
+\matref{Q1}、\matref{Q2}に基づいて、テーブルqTableの更新、則ち学習を行う。
 
 \lstinputlisting[caption = qTableAgent.py ,label = qTableAgent]{lib/model/qTableAgent.py}
+
+\subsubsection{mainQTable.py} \label{seq:mainQTable}
+\srcref{mainQTable}に示すmainQTable.pyでは、テーブルQ学習を行う実行スクリプトとして実装した。
+\par
+% まず、5-23行目に示すコンストラクタでは、
+% 状態空間と行動空間の各次元の分割数K、Lを引数に取り、Qテーブルとして
+% \secref{sec:qTable}で実装したQTableクラスのインスタンスqTableを作成している。
+% \par
+% 13-17行目の関数save\_modelsは
+% 環境env、現在の学習ステップcurrent\_step、シード値seed、保存先ディレクりのパスpathを引数に取り、
+% pikleモジュールの関数dumpを利用して、学習エージェントの状態をpickle化し、pathが示すディレクトリにファイルとして保存する。
+% この際、環境名、学習ステップ、シード値に対して一意のファイル名を付ける。
+% 逆に、
+% 19-22行目の関数load\_modelsはpath、ファイル名filenameを引数に取り、
+% pathが示すディレクトリから該当するファイル名のpickleファイルを非pickle化し返す。
+% \par
+% 24-25行目の関数select\_actionは、方策$\pi$を求める関数であり、
+% テーブルqTableのメソッドselect\_actionを利用し、
+% \matref{Qpi}に基づいて、次のステップの行動を返す。
+% また、
+% 27-31行目の関数select\_exploratory\_actionは、行動方策$\beta$を求める関数であり、
+% \matref{Qbeta}に基づいて、同様に次のステップの行動を返す。
+% \par
+% そして、33-34行目の関数trainはエージェントの学習を行う関数であり、
+% テーブルqTableのメソッドupdate\_actionを利用し、
+% \matref{Q1}、\matref{Q2}に基づいて、テーブルqTableの更新、則ち学習を行う。
+
+\lstinputlisting[caption = mainQTable.py ,label = mainQTable]{exec/mainQTable.py}
 
 \subsection{方法2:経験再生バッファーの実装}
 

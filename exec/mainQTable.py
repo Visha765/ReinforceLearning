@@ -16,7 +16,7 @@ env_name = 'Pendulum-v0'
     
 train_step = 500000
 train_seeds = [11, 13, 17, 19, 23]
-interval = 10000
+interval = 1000
 K, L = 10, 9
 
 episode = 10 # 10
@@ -53,7 +53,6 @@ def thread(train_seed):
         agent, _ = agent.load_models(path=path, filename=file)
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
         data_list.append(rewards)
-        print(np.mean(rewards))
         env.close()
         
     ### Visualize ###

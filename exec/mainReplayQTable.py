@@ -15,9 +15,9 @@ from lib.model.replayQTableAgent import ReplayQTableAgent
 env_name = 'Pendulum-v0'
 
 train_seeds = [11, 13, 17, 19, 23]    
-train_step = 10000 #500000 
+train_step = 500000 
 interval = 1000
-K, L = 20, 18
+K, L = 10, 9
 buffer_size = train_step
 batch_size = 256
 
@@ -27,7 +27,7 @@ eval_step = 10000
 
 
 def thread(train_seed):
-    ### Train ###
+    ## Train ###
     print('-'*10, "start Train", '-'*10)
     
     env = gym.make(env_name)
@@ -41,8 +41,8 @@ def thread(train_seed):
     if not os.path.exists(path):
         os.mkdir(path)
     
-    Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
-    env.close()
+    # Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
+    # env.close()
     
     
     ### Evaluation ###
@@ -54,11 +54,8 @@ def thread(train_seed):
         env = gym.make(env_name)
         env.seed(eval_seed)
         agent, _ = agent.load_models(path=path, filename=file)
-        
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
-        
         data_list.append(rewards)
-        print(np.mean(rewards))
         env.close()
         
         

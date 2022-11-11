@@ -12,21 +12,10 @@ class ReplayQTableAgent(QTableAgent):
     self.batch_size = batch_size
     
   def save_models(self, env, current_step, seed, path):
-    # print('saved step:', current_step)
     tmp = copy.deepcopy(self.buffer)
     self.buffer = []
     super().save_models(env, current_step, seed, path)
     self.buffer = tmp
-    
-    # data = {
-    #         'agent': copy.deepcopy(self), 
-    #         'saved_step': current_step,
-    #       }
-    # data['agent'].buffer = []
-    # filename = f"log_{env.unwrapped.spec.id}_seed{seed}_step{current_step}.pikle"
-    # with open(os.path.join(path, filename), 'wb') as f:
-    #   pickle.dump(data, f)
-    
 
   def train(self, state, action, next_state, reward, done):
     self.buffer.add(state, action, next_state, reward, done)

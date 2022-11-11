@@ -4,9 +4,9 @@ import sys, os
 import gym
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from lib.training.Train import Train
-from lib.training.Evaluation import Evaluation
-from lib.util.fetchPikle import fetch_pikles
+from lib.training.train import Train
+from lib.training.evaluation import Evaluation
+from lib.util.fetchPickle import fetch_pickle
 from lib.util.linePlot import LinePlot
 from lib.model.replayQTableAgent import ReplayQTableAgent
 
@@ -48,7 +48,7 @@ def thread(train_seed):
     ### Evaluation ###
     print('-'*10, "start Evaluation", '-'*10)
     
-    saved_steps, files = fetch_pikles(path)
+    saved_steps, files = fetch_pickle(path)
     data_list = []
     for file in files:
         env = gym.make(env_name)

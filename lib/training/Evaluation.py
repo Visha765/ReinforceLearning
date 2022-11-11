@@ -1,14 +1,6 @@
-from tqdm import tqdm
-import numpy as np
-import sys, os
-import gym
-from ..model.agent import Agent
-
-
-def Evaluation(env, agent, max_step: int, episode: int, seed: int):
+def Evaluation(env, agent, max_step, episode, seed):
 
   rewards = []
-
   for it in range(episode):
     state = env.reset()
     sum_reward = 0

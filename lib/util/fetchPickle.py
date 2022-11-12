@@ -3,7 +3,7 @@ import sys, os
 import re
 
 def fetch_pickle(path):
-  files = glob.glob(os.path.join(path,"*.pikle"))
+  files = glob.glob(os.path.join(path,"*.pickle"))
   files = [os.path.split(file)[1] for file in files]
   saved_steps = [re.search(r'step[0-9]+', file).group() for file in files]
   saved_steps = [int(step.lstrip("step")) for step in saved_steps]

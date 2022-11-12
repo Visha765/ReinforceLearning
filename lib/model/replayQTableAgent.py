@@ -21,4 +21,4 @@ class ReplayQTableAgent(QTableAgent):
     self.buffer.add(state, action, next_state, reward, done)
     for exp in self.buffer.sample(self.batch_size):
       state, action, next_state, reward, done = exp
-      self.qTable.update_Qtable(state, action, reward, next_state, done)
+      self.qTable.update_qTable(state, action, reward, next_state, done)

@@ -5,4 +5,4 @@ __pycache__
 .python-version
 .DS_Store
 tmp.py
-*.tex
+report1.tex

@@ -4,7 +4,6 @@ def Train(env, agent, end_step, seed, save_interval, path):
   state = env.reset()
   
   for t in tqdm(range(end_step)):
-      
     # env.render()
     action = agent.select_exploratory_action(state)
     next_state, reward, done, info = env.step(action)

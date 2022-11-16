@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 import numpy as np
 import sys, os
+import glob
 import gym
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -16,15 +17,17 @@ env_name = 'Pendulum-v0'
     
 train_step = 500000
 train_seeds = [11, 13, 17, 19, 23]
-interval = 1000
+interval = 10000
 K, L = 10, 9
 
 episode = 10 # 10
-eval_step = 10000
+eval_step = 10000 #maxstep
 eval_seed = 0
-    
 
-def thread(train_seed):
+
+saved_steps = [i for i in range(interval, train_step+1, interval)]
+
+def worker(train_seed):
     ### Train ###
     print('-'*10, "start Train", '-'*10)
     
@@ -32,7 +35,8 @@ def thread(train_seed):
     env.seed(train_seed)
     np.random.seed(train_seed)
     agent = QTableAgent(K, L)
-    path=f"out/{agent.__class__.__name__ }_seed{train_seed}"
+    
+    path = f"out/{env_name}_{agent.__class__.__name__}_seed{train_seed}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):
@@ -45,25 +49,31 @@ def thread(train_seed):
     ### Evaluation ###
     print('-'*10, "start Evaluation", '-'*10)
     
-    saved_steps, files = fetch_pickle(path)
-    data_list = []
+    # saved_steps, files = fetch_pickle(path)
+    files = glob.glob(os.path.join(path, "*.pickle"))
+    files = [os.path.split(file)[1] for file in files]
+    data = [[] for i in range(len(saved_steps))]
     for file in files:
         env = gym.make(env_name)
         env.seed(eval_seed)
-        agent, _ = agent.load_models(path=path, filename=file)
+        agent, saved_step= agent.load_models(path=path, filename=file)
         rewards = Evaluation(env=env, agent=agent, max_step=eval_step, episode=episode, seed=eval_seed)
-        data_list.append(rewards)
+        if saved_step <= train_step:
+            data[saved_step//interval-1].extend(rewards) 
         env.close()
+    return data
         
-    ### Visualize ###
-    LinePlot(data_list=data_list, label_list=saved_steps, env_name=env_name, seed=train_seed, path=path)
 
-
-def main():
+if __name__ == '__main__':
     p = Pool(len(train_seeds))
-    p.map(thread, train_seeds)
+    data_list = p.map(worker, train_seeds)
     p.close()
     
-if __name__ == '__main__':
-    main()
+    
+    ### Visuallize ###
+    data_list = np.array(data_list)
+    len_s, len_d, len_e = data_list.shape
+    data_list = data_list.transpose(1,0,2).reshape(len_d, len_s*len_e)
+    
+    LinePlot(data_list ,saved_steps, env_name, "QTableAgent", 'out')
     

@@ -11,7 +11,7 @@ def Evaluation(env, agent, max_step, episode, seed):
       sum_reward += reward
       state = next_state
       if done:
-        break  
+        break 
     rewards.append(sum_reward)
 
   return rewards;

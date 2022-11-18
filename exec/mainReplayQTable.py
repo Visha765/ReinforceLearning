@@ -14,6 +14,7 @@ from lib.model.replayQTableAgent import ReplayQTableAgent
 
 ### Condition ###
 env_name = 'Pendulum-v0'
+agent_name = "ReplayQTableAgent"
 
 train_seeds = [11, 13, 17, 19, 23]    
 train_step = 500000 
@@ -36,12 +37,11 @@ def worker(train_seed):
     np.random.seed(train_seed)
     agent = ReplayQTableAgent(K, L, buffer_size, batch_size)
 
-    path = f"out/{env_name}_{agent.__class__.__name__}_seed{train_seed}"
+    path = f"out/{env_name}_{agent_name}_seed{train_seed}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
-
     
     # Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
     # env.close()
@@ -50,7 +50,6 @@ def worker(train_seed):
     ### Evaluation ###
     print('-'*10, "start Evaluation", '-'*10)
     
-    # saved_steps, files = fetch_pickle(path)
     files = glob.glob(os.path.join(path, "*.pickle"))
     files = [os.path.split(file)[1] for file in files]
     data = [[] for i in range(train_step//interval)]
@@ -77,5 +76,9 @@ if __name__ == '__main__':
     data_list = data_list.transpose(1,0,2).reshape(len_d, len_s*len_e)
     saved_steps = [i for i in range(interval, train_step+1, interval)]
     
-    LinePlot(data_list ,saved_steps, env_name, "ReplayQTableAgent", 'out')
+    LinePlot(data_list ,saved_steps, f"{env_name}_{agent_name}", 'out')
     
+    import pickle
+    with open(os.path.join('out', f'{env_name}_{agent_name}_{train_seeds}.pickel'), 'wb') as f:
+        data = (data_list, saved_steps)
+        pickle.dump(data, f)

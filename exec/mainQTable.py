@@ -20,13 +20,17 @@ class args:
     eval_step = 10000 #maxstep
     eval_seed = 0
     K, L = 10, 9
+    gamma=0.99
+    alpha=3*1e-4
+    epsilon=0.05
     
     # changed in each process
     def __init__(self, train_seed):
         self.train_seed = train_seed
     # return new agent
     def agent(self):
-        return QTableAgent(self.K, self.L)
+        return QTableAgent(self.K, self.L, \
+                        self.gamma, self.alpha, self.epsilon)
     
 train_seeds = [11, 13, 17, 19, 23]
 args_list = [args(train_seed) for train_seed in train_seeds]

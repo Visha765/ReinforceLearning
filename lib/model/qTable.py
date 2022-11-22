@@ -2,13 +2,13 @@ import numpy as np
 
 class QTable():
   
-  def __init__(self, K :int ,L :int):
-    self.gamma = 0.99
-    self.alpha = 3*1e-4
-
+  def __init__(self, K, L, gamma, alpha):
     self.K = K
     self.L = L
     
+    self.gamma = gamma
+    self.alpha = alpha
+    ### range
     theta = (-np.pi, np.pi)
     omega = (-8, 8)
     tau = (-2, 2)

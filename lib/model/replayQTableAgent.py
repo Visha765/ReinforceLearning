@@ -6,8 +6,8 @@ from .replayBuffer import ReplayBuffer
 
 class ReplayQTableAgent(QTableAgent):
   
-  def __init__(self, K, L, buffer_size, batch_size):
-    super().__init__(K, L)
+  def __init__(self, K, L, buffer_size, batch_size, gamma=0.99, alpha=3*1e-4, epsilon=0.05):
+    super().__init__(K, L, gamma, alpha, epsilon)
     self.buffer = ReplayBuffer(buffer_size)
     self.batch_size = batch_size
     

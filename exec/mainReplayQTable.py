@@ -18,8 +18,12 @@ class args:
     interval = 10000
     episode = 10 # 10
     eval_step = 10000 #maxstep
-    eval_seed = 0
+    eval_seed = 0 #0
     K, L = 10, 9
+    gamma=0.99
+    alpha=3*1e-4
+    epsilon=0.05
+    
     buffer_size = train_step
     batch_size = 256
     
@@ -28,7 +32,8 @@ class args:
         self.train_seed = train_seed
     # return new agent
     def agent(self):
-        return ReplayQTableAgent(self.K, self.L, self.buffer_size, self.batch_size)
+        return ReplayQTableAgent(self.K, self.L, self.buffer_size, self.batch_size, \
+                            self.gamma, self.alpha, self.epsilon)
     
 train_seeds = [11, 13, 17, 19, 23]
 args_list = [args(train_seed) for train_seed in train_seeds]

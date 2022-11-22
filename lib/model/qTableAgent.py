@@ -6,9 +6,9 @@ from .agent import Agent
 from .qTable import QTable
 
 class QTableAgent(Agent):
-  def __init__(self, K, L):
-    self.epsilon = 0.05
-    self.qTable = QTable(K, L)
+  def __init__(self, K, L, gamma=0.99, alpha=3*1e-4, epsilon=0.05):
+    self.epsilon = epsilon
+    self.qTable = QTable(K, L, gamma, alpha)
 
   def save_models(self, env, current_step, seed, path):
     data = {'agent': self, 'saved_step': current_step,}

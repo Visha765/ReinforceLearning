@@ -13,6 +13,6 @@ class ReplayBuffer():
     size = min(len(self.que), batch_size)
     
     rand_nums = np.random.choice(len(self.que), size, replace=False)
-    return [self.que[i] for i in rand_nums]
+    return np.ndarray([self.que[i] for i in rand_nums]).T
 
     

@@ -7,7 +7,6 @@ import gym
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from lib.training.train import Train
 from lib.training.evaluation import Evaluation
-from lib.util.fetchPickle import fetch_pickle
 from lib.util.linePlot import LinePlot
 from lib.model.replayQTableAgent import ReplayQTableAgent
 
@@ -43,8 +42,8 @@ def worker(train_seed):
     if not os.path.exists(path):
         os.mkdir(path)
     
-    # Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
-    # env.close()
+    Train(env=env, agent=agent, end_step=train_step, seed=train_seed, save_interval=interval, path=path)
+    env.close()
     
     
     ### Evaluation ###

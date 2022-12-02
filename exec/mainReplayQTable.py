@@ -11,23 +11,22 @@ from lib.model.replayQTableAgent import ReplayQTableAgent
 ### Condition ###
 @dataclass
 class args:
-    env_name = "Pendulum-v0"
-    agent_name = "ReplayQTableAgent"       
-    train_step = 500000
-    train_seed = 0
-    interval = 10000
-    episode = 10 # 10
-    eval_step = 10000 #maxstep
-    eval_seed = 0 #0
-    K, L = 10, 9
-    gamma=0.99
-    alpha=3*1e-4
-    epsilon=0.05
+    env_name = "Pendulum-v0" # 環境名
+    agent_name = "ReplayQTableAgent" # エージェント名      
+    train_step = 500000 # 学習最大ステップ
+    train_seed = 0 # 学習環境のseed値
+    interval = 10000 # 状態を保存する間隔
+    episode = 10 # 評価のエピソード数
+    eval_step = 10000 # 評価最大ステップ数
+    eval_seed = 0 # 評価環境のseed値
+    K, L = 10, 9 # 状態、行動空間の各次元の分割数
+    gamma=0.99 # 減衰率
+    alpha=3*1e-4 # 学習率
+    epsilon=0.05 # 行動方策のパラメータ
     
-    buffer_size = train_step
-    batch_size = 256
-    
-    # changed in each process
+    buffer_size = train_step # バッファーサイズ
+    batch_size = 256 # バッチサイズ
+
     def __init__(self, train_seed):
         self.train_seed = train_seed
     # return new agent

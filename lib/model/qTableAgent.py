@@ -10,9 +10,9 @@ class QTableAgent(Agent):
     self.epsilon = epsilon
     self.qTable = QTable(K, L, gamma, alpha)
 
-  def save_models(self, env, current_step, seed, path):
+  def save_models(self, env, current_step, path):
     data = {'agent': self, 'saved_step': current_step,}
-    filename = f"log_{env.unwrapped.spec.id}_seed{seed}_step{current_step}.pickle"
+    filename = f"log_{env.unwrapped.spec.id}_step{current_step}.pickle"
     with open(os.path.join(path, filename), 'wb') as f:
       pickle.dump(data, f)
 

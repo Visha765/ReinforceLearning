@@ -11,10 +11,10 @@ class ReplayQTableAgent(QTableAgent):
     self.buffer = ReplayBuffer(buffer_size)
     self.batch_size = batch_size
     
-  def save_models(self, env, current_step, seed, path):
+  def save_models(self, env, current_step, path):
     tmp = copy.deepcopy(self.buffer)
     self.buffer = []
-    super().save_models(env, current_step, seed, path)
+    super().save_models(env, current_step, path)
     self.buffer = tmp
 
   def train(self, state, action, next_state, reward, done):

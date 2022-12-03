@@ -15,9 +15,9 @@ from lib.util.linePlot import LinePlot
 class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "" # エージェント名
-    train_step = 5000 # 学習最大ステップ
+    train_step = 500 # 学習最大ステップ
     train_seed = 0 # 学習環境のseed値
-    interval = 1000 # 状態を保存する間隔
+    interval = 100 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
@@ -40,7 +40,7 @@ class params_QTable(params):
         
 class params_ReplayQTable(params):
     agent_name = "ReplayQTableAgent"
-    buffer_size = 5000 # バッファーサイズ
+    buffer_size = 500000 # バッファーサイズ
     batch_size = 256 # バッチサイズ
     def agent(self):
         return ReplayQTableAgent(self.K, self.L, self.buffer_size, self.batch_size, \

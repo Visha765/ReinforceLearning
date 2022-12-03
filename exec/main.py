@@ -17,7 +17,7 @@ class params:
     agent_name = "" # エージェント名
     train_step = 500000 # 学習最大ステップ
     train_seed = 0 # 学習環境のseed値
-    interval = 10000 # 状態を保存する間隔
+    interval = 5000 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値

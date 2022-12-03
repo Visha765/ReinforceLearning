@@ -31,7 +31,7 @@ def Worker(d):
     
     files = glob.glob(os.path.join(path, "*.pickle"))
     files = [os.path.split(file)[1] for file in files]
-    data = [[] for i in range(d.train_step//d.interval)]
+    rewards_list = [[] for i in range(d.train_step//d.interval+1)]
     for file in files:
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)
@@ -39,6 +39,6 @@ def Worker(d):
         if saved_step > d.train_step: 
             break
         rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode)
-        data[saved_step//d.interval-1].extend(rewards) 
+        rewards_list[saved_step//d.interval].extend(rewards) 
         env.close()
-    return data
+    return rewards_list

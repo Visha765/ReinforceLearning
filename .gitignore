@@ -1,8 +1,9 @@
 out
-experiment
+tmp
 data
 __pycache__
 .python-version
 .DS_Store
 tmp.py
 *.tex
+experiment

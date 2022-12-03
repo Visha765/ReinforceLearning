@@ -7,7 +7,6 @@ from lib.training.worker import Worker
 from lib.util.visuallize import Visuallize
 from lib.model.qTableAgent import QTableAgent
 
-
 ### Condition ###
 @dataclass
 class args:
@@ -36,9 +35,9 @@ args_list = [args(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':
     ### Training & Evaluation ###
-    p = Pool(len(train_seeds))
+    p = Pool(len(args_list))
     data_list = p.map(Worker, args_list)
     p.close()
     
     ### Visuallize ###
-    Visuallize(data_list, args_list[0], train_seeds)
+    Visuallize(data_list, args_list[0])

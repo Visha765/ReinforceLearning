@@ -15,9 +15,9 @@ from lib.util.linePlot import LinePlot
 class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "" # エージェント名
-    train_step = 500 # 学習最大ステップ
+    train_step = 500000 # 学習最大ステップ
     train_seed = 0 # 学習環境のseed値
-    interval = 100 # 状態を保存する間隔
+    interval = 10000 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
@@ -54,11 +54,11 @@ if __name__ == '__main__':
     data_list = []
     label_list = []
     for cond in (cond1, cond2):
-      p = Pool(len(cond))
-      data = p.map(Worker, cond)
-      p.close()
-      data = Transform(data)
-      data_list.append(data)
+        p = Pool(len(cond))
+        data = p.map(Worker, cond)
+        p.close()
+        data = Transform(data)
+        data_list.append(data)
 
     ### Visuallize ###
     label_list = ["方法1", "方法2"]

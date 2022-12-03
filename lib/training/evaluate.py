@@ -1,5 +1,4 @@
-def Evaluate(env, agent, max_step, episode, seed):
-
+def Evaluate(env, agent, max_step, episode):
   rewards = []
   for it in range(episode):
     state = env.reset()

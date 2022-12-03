@@ -12,9 +12,9 @@ def Worker(d):
     print('-'*10, "start Train", '-'*10)
     
     env = gym.make(d.env_name)
+    agent = d.agent()
     env.seed(d.train_seed)
     np.random.seed(d.train_seed)
-    agent = d.agent()
     # save directory
     path = f"out/{d.env_name}_{d.agent_name}_seed{d.train_seed}"
     if not os.path.exists('out'):
@@ -22,7 +22,7 @@ def Worker(d):
     if not os.path.exists(path):
         os.mkdir(path)
     
-    Train(env=env, agent=agent, end_step=d.train_step, save_interval=d.interval, path=path)
+    Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
     env.close()
     
     
@@ -35,9 +35,10 @@ def Worker(d):
     for file in files:
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)
-        agent, saved_step= agent.load_models(path=path, filename=file)
-        rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode, seed=d.eval_seed)
-        if saved_step <= d.train_step:
-            data[saved_step//d.interval-1].extend(rewards) 
+        agent, saved_step = agent.load_models(path=path, filename=file)
+        if saved_step > d.train_step: 
+            break
+        rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode)
+        data[saved_step//d.interval-1].extend(rewards) 
         env.close()
     return data

@@ -40,7 +40,7 @@ class params:
                             self.gamma, self.alpha, self.epsilon)
 
 train_seeds = [11, 13, 17, 19, 23]
-buffer_sizes = [125000]
+buffer_sizes = [500000, 50000, 5000]
 cond_list = []
 for buffer_size in buffer_sizes:
     cond = [params(train_seed, buffer_size) for train_seed in train_seeds]

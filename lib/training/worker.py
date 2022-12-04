@@ -16,7 +16,7 @@ def Worker(d):
     env.seed(d.train_seed)
     np.random.seed(d.train_seed)
     # save directory
-    path = f"out/{d.env_name}_{d.agent_name}_seed{d.train_seed}"
+    path = f"out/{d.dir_name}"
     if not os.path.exists('out'):
         os.mkdir('out')
     if not os.path.exists(path):

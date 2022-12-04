@@ -14,21 +14,23 @@ from lib.util.linePlot import LinePlot
 @dataclass
 class params:
     env_name = "Pendulum-v0" # 環境名
-    agent_name = "" # エージェント名
+    agent_name = None # エージェント名
+    dir_name = None # 保存先ディレクトリ
     train_step = 500000 # 学習最大ステップ
-    train_seed = 0 # 学習環境のseed値
+    train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
     K, L = 10, 9 # 状態、行動空間の各次元の分割数
-    gamma=0.99 # 減衰率
-    alpha=3*1e-4 # 学習率
-    epsilon=0.05 # 行動方策のパラメータ
+    gamma = 0.99 # 減衰率
+    alpha = 3*1e-4 # 学習率
+    epsilon = 0.05 # 行動方策のパラメータ
     
     def __init__(self, train_seed):
         self.train_seed = train_seed
-    # return new agent
+        self.dir_name = f"{self.env_name}_{self.agent_name}_{self.train_seed}" # 保存先ディレクトリ
+        
     def agent(self):
         pass
 

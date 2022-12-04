@@ -14,9 +14,10 @@ from lib.util.linePlot import LinePlot
 @dataclass
 class params:
     env_name = "Pendulum-v0" # 環境名
-    agent_name = "" # エージェント名
+    agent_name = None # エージェント名
+    dir_name = None # 保存先ディレクトリ
     train_step = 500000 # 学習最大ステップ
-    train_seed = 0 # 学習環境のseed値
+    train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
@@ -32,14 +33,14 @@ class params:
     def __init__(self, train_seed, buffer_size):
         self.train_seed = train_seed
         self.buffer_size = buffer_size
-    # return new agent
+        self.dir_name = f"{self.env_name}_{self.buffer_size}_{self.train_seed}" # 保存先ディレクトリ
+
     def agent(self):
         return ReplayQTableAgent(self.K, self.L, self.buffer_size, self.batch_size, \
                             self.gamma, self.alpha, self.epsilon)
 
 train_seeds = [11, 13, 17, 19, 23]
 buffer_sizes = [500000, 250000, 125000]
-
 cond_list = []
 for buffer_size in buffer_sizes:
     cond = [params(train_seed, buffer_size) for train_seed in train_seeds]
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     data_list = []
     label_list = []
     for cond in cond_list:
-        p = Pool(len(cond))
+        p = Pool(5)
         data = p.map(Worker, cond)
         p.close()
         data = Transform(data)

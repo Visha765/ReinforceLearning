@@ -28,7 +28,7 @@ class params:
     epsilon=0.05 # 行動方策のパラメータ
     
     buffer_size = None # バッファーサイズ
-    batch_size = 128 # バッチサイズ
+    batch_size = 256 # バッチサイズ
     
     def __init__(self, train_seed, buffer_size):
         self.train_seed = train_seed
@@ -40,7 +40,7 @@ class params:
                             self.gamma, self.alpha, self.epsilon)
 
 train_seeds = [11, 13, 17, 19, 23]
-buffer_sizes = [500000, 250000, 125000, 62500]
+buffer_sizes = [125000]
 cond_list = []
 for buffer_size in buffer_sizes:
     cond = [params(train_seed, buffer_size) for train_seed in train_seeds]

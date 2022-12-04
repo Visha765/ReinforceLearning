@@ -20,7 +20,7 @@ class params:
     train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 10 # 評価のエピソード数
-    eval_step = 10000 # 評価最大ステップ数
+    eval_step = 5000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
     K, L = 10, 9 # 状態、行動空間の各次元の分割数
     gamma = 0.99 # 減衰率
@@ -54,7 +54,6 @@ cond2 = [params_ReplayQTable(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':
     data_list = []
-    label_list = []
     for cond in (cond1, cond2):
         p = Pool(len(cond))
         data = p.map(Worker, cond)

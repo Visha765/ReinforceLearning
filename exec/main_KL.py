@@ -22,7 +22,7 @@ class params:
     episode = 10 # 評価のエピソード数
     eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
-    K, L = 10, 9 # 状態、行動空間の各次元の分割数
+    K, L = None, None # 状態、行動空間の各次元の分割数
     gamma=0.99 # 減衰率
     alpha=3*1e-4 # 学習率
     epsilon=0.05 # 行動方策のパラメータ
@@ -41,7 +41,7 @@ class params:
                             self.gamma, self.alpha, self.epsilon)
 
 train_seeds = [11, 13, 17, 19, 23]
-kl = [(10, 9), (20, 18), (40, 36), (80, 72)]
+kl = [(5,4), (10, 9), (20, 18), (40, 36), (80, 72)]
 cond_list = []
 for K, L in kl:
     cond = [params(train_seed, K, L) for train_seed in train_seeds]

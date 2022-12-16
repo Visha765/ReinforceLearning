@@ -7,17 +7,17 @@ from agent import Agent
 from replay_buffer import ReplayBuffer
 from actor import ActorNet
 from critic import CriticNet
+from xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
-  def __init__(self, K, L, buffer_size, batch_size, gamma=0.99, alpha=3*1e-4, epsilon=0.05):
+  def __init__(self, buffer_size, batch_size, gamma=0.99, sigma_beta=0.1):
     self.buffer = ReplayBuffer(buffer_size)
     self.batch_size = batch_size
     self.gamma = gamma
-    self.alpha = alpha
-    self.epsilon = epsilon
+    self.sigma_beta = sigma_beta
     
-    self.actor = ActorNet(K**2,L)
-    self.critic = CriticNet(K**2, L)
+    self.actor = ActorNet(2, 1)
+    self.critic = CriticNet(2, 1)
 
   def save_models(self, env, current_step, path):
     data = {'agent': self, 'saved_step': current_step,}
@@ -31,22 +31,54 @@ class ActorCriticAgent(Agent):
     return (data[key] for key in ('agent', 'saved_step'))
 
   def select_action(self, state):
-    pass
-    # return [self.qTable.get_maxQ_action(state)]
+    state = xy2theta(state)
+    return self.actor(torch.tensor([state,])).detach().numpy()[0]
   
-  def select_exploratory_action(self, state):
-    pass
-    # if self.epsilon < np.random.uniform(0,1):
-    #   return self.select_action(state)
-    # else:
-    #   return np.random.choice(self.qTable.actions, 1)
+  def select_exploratory_action(self, state, current_step):
+    T_expl = 1000
+    tau = (-2, 2)
+    
+    if current_step < T_expl:
+      return np.random.uniform(*tau, 1)
+    
+    D = (tau[1] - tau[0]) * self.sigma_beta/2
+    return self.select_action(state) + np.random.normal(0, D**2)
 
   def train(self, state, action, next_state, reward, done):
+    state = xy2theta(state)
+    next_state = xy2theta(next_state)
     self.buffer.add(state, action, next_state, reward, done)
-    delta = []
-    for state, action, next_state, reward, done in self.buffer.sample(self.batch_size):
-      delta.append(reward + (1-done) * self.gamma * self.critic.forward([next_state, self.select_action(next_state)]))
-    criterion = nn.MSELoss()
-    loss = criterion()
+    
+    states, actions, next_states, rewards, dones = self.buffer.sample(self.batch_size)
 
-      
+    # critic
+    criterion_omega = nn.MSELoss()
+    optimizer_omega = torch.optim.Adam(self.critic.parameters(), lr=0.01)
+    
+    next_states = torch.Tensor(next_states)
+    next_actions = self.actor(next_states)
+
+    tmp = torch.cat([next_states, next_actions], dim=1)
+    Q_omega = self.critic(tmp)
+    delta = torch.Tensor(rewards).view(-1,1) + self.gamma * torch.mul(torch.Tensor(np.logical_not(dones)).view(-1,1), Q_omega)
+
+    states = torch.Tensor(states)
+    actions = torch.Tensor(actions)
+    tmp = torch.cat([states, actions], dim=1)
+    Q_omega = self.critic(tmp)
+
+    optimizer_omega.zero_grad()
+    loss_omega = criterion_omega(Q_omega, delta)
+    loss_omega.backward()
+    optimizer_omega.step()
+    
+    # actor
+    optimizer_theta = torch.optim.Adam(self.actor.parameters(), lr=0.01)
+    
+    actions = self.actor(states)
+    
+    optimizer_theta.zero_grad()
+    loss_theta = torch.mean(-self.critic(torch.cat([states, actions], dim=1)))
+    loss_theta.backward()
+    optimizer_theta.step()
+    

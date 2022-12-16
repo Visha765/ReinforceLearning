@@ -16,11 +16,18 @@ class ReplayBuffer():
     size = min(len(self.que), batch_size)
     rand_nums = np.random.choice(len(self.que), size, replace=False)
     # return [self.que[i] for i in rand_nums]
-    dic = {"state":[], "action":[], "next_state":[], "reward":[], "done":[]}
+    states = []
+    actions = []
+    next_states = []
+    rewards = []
+    dones = []
     for i in rand_nums:
-      exp = self.que[i]
-      dic["state"].append(exp[0])
-      dic["action"].append(exp[1])
-      dic["next_state"].append(exp[2])
-      dic["reward"].append(exp[3])
-      dic["done"].append(exp[4])
+      state, action, next_state, reward, done = self.que[i]
+      states.append(state)
+      actions.append(action)
+      next_states.append(next_state)
+      rewards.append(reward)
+      dones.append(done)
+
+
+    return states, actions, next_states, rewards, dones

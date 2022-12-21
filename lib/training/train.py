@@ -1,7 +1,7 @@
 from tqdm import tqdm
 
 def Train(env, agent, end_step, interval, path):
-  agent.save_models(env=env, current_step=0, path=path)
+  agent.save_models(current_step=0, path=path)
   state = env.reset()
   for step in tqdm(range(end_step)):
     # env.render()
@@ -14,4 +14,4 @@ def Train(env, agent, end_step, interval, path):
         
     ## save model per interval
     if ((step+1) % interval == 0):
-      agent.save_models(env=env, current_step=step+1, path=path)
+      agent.save_models(current_step=step+1, path=path)

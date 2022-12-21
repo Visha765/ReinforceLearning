@@ -34,12 +34,12 @@ class params:
         return ActorCriticAgent(self.buffer_size, self.batch_size)
     
 train_seeds = [11, 13, 17, 19, 23]
-cond = [params(train_seed) for train_seed in train_seeds]
+conditions = [params(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':
     data_list = []
-    p = Pool(len(cond))
-    data = p.map(Worker, cond)
+    p = Pool(len(conditions))
+    data = p.map(Worker, conditions)
     p.close()
     data = Transform(data)
     data_list.append(data)
@@ -49,5 +49,5 @@ if __name__ == '__main__':
     saved_steps = [i for i in range(0, params.train_step+1, params.interval)]
     filename = "ActorCritic"
     LinePlot(data_list=data_list, label_list=label_list, x=saved_steps,
-            filename=filename ,path="out")
+            filename=filename, path="out")
 

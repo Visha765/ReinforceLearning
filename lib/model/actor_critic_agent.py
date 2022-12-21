@@ -26,7 +26,7 @@ class ActorCriticAgent(Agent):
     self.optimizer_critic = torch.optim.Adam(self.critic.parameters(), lr=0.01)
     
 
-  def save_models(self, env, current_step, path):
+  def save_models(self, current_step, path):
     filename = "log_step{:07d}.pickle".format(current_step)
     tmp = copy.deepcopy(self.buffer)
     self.buffer = []
@@ -41,11 +41,10 @@ class ActorCriticAgent(Agent):
 
   def select_action(self, state):
     state = xy2theta(state)
-    return self.actor(self.list2tensor([state,])).detach().numpy()[0]
+    return self.actor(self.list2tensor([state,])).detach().numpy()[0] #tensor -> ndarray
   
   def select_exploratory_action(self, state, current_step):
     tau = (-2, 2)
-    
     if current_step < self.T_expl:
       return np.random.uniform(*tau, 1)
     
@@ -63,25 +62,27 @@ class ActorCriticAgent(Agent):
     next_states = self.list2tensor(next_states)
     next_actions = self.actor(next_states)
 
-    Q_omega = self.critic(torch.cat([next_states, next_actions], dim=1))
-    delta = self.list2tensor(rewards).view(-1,1) + self.gamma * torch.mul(self.list2tensor(np.logical_not(dones)).view(-1,1), Q_omega)
+    Q_actor = self.critic(torch.cat([next_states, next_actions], dim=1))
+    delta = self.list2tensor(rewards).view(-1,1) \
+      + self.gamma * torch.mul(self.list2tensor(np.logical_not(dones)).view(-1,1), Q_actor)
 
     states = self.list2tensor(states)
     actions = self.list2tensor(actions)
-    Q_omega = self.critic(torch.cat([states, actions], dim=1))
+    Q = self.critic(torch.cat([states, actions], dim=1))
+    loss_omega = self.criterion_critic(Q, delta)
+    loss_omega.backward()
 
     self.optimizer_critic.zero_grad()
-    loss_omega = self.criterion_critic(Q_omega, delta)
-    loss_omega.backward()
     self.optimizer_critic.step()
     
     # actor    
     actions = self.actor(states)
     
-    self.optimizer_actor.zero_grad()
     loss_theta = torch.mean(-self.critic(torch.cat([states, actions], dim=1)))
     loss_theta.backward()
+    self.optimizer_actor.zero_grad()
     self.optimizer_actor.step()
+    
     
   def list2tensor(self, x):
     x = np.array(x)

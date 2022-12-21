@@ -15,7 +15,6 @@ class ReplayBuffer():
   def sample(self, batch_size):
     size = min(len(self.que), batch_size)
     rand_nums = np.random.choice(len(self.que), size, replace=False)
-    # return [self.que[i] for i in rand_nums]
     states = []
     actions = []
     next_states = []
@@ -28,6 +27,5 @@ class ReplayBuffer():
       next_states.append(next_state)
       rewards.append(reward)
       dones.append(done)
-
 
     return states, actions, next_states, rewards, dones

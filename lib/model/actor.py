@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from custom_tanh import *
+from lib.util.custom_tanh import *
 
 class ActorNet(nn.Module):
     

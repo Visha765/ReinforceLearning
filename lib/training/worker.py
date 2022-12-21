@@ -9,7 +9,7 @@ from lib.training.evaluate import Evaluate
 # d is dataclass
 def Worker(d):
     ## Training ###
-    print('-'*10, "start Train", '-'*10)
+    print('-'*10, "start Train-", d.train_seed, '-'*10)
     
     env = gym.make(d.env_name)
     agent = d.agent()
@@ -27,18 +27,17 @@ def Worker(d):
     
     
     ### Evaluation ###
-    print('-'*10, "start Evaluation", '-'*10)
+    print('-'*10, "start Evaluation", d.train_seed, '-'*10)
     
     files = glob.glob(os.path.join(path, "*.pickle"))
     files = [os.path.split(file)[1] for file in files]
-    rewards_list = [[] for i in range(d.train_step//d.interval+1)]
+    files.sort()
+    rewards_list = []
     for file in files:
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)
-        agent, saved_step = agent.load_models(path=path, filename=file)
-        if saved_step > d.train_step: 
-            break
+        agent = agent.load_models(path=path, filename=file)
         rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode)
-        rewards_list[saved_step//d.interval].extend(rewards) 
+        rewards_list.append(rewards) 
         env.close()
     return rewards_list

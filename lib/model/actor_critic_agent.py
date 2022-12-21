@@ -63,8 +63,9 @@ class ActorCriticAgent(Agent):
     actions = self.list2tensor(actions)
     next_states = self.list2tensor(next_states)
     rewards = self.list2tensor(rewards)
-    dones_rev = self.list2tensor(~np.array(dones))
+    dones_rev = self.list2tensor(np.logical_not(dones))
     
+    self.optimizer_critic.zero_grad()
     next_pred_actions = self.actor(next_states)
     Q_actor = self.critic(torch.cat([next_states, next_pred_actions], dim=1))
     delta = rewards.view(-1,1) \
@@ -73,15 +74,14 @@ class ActorCriticAgent(Agent):
     loss_omega = self.criterion_critic(Q, delta)
     loss_omega.backward()
 
-    self.optimizer_critic.zero_grad()
     self.optimizer_critic.step()
     
     # actor    
+    self.optimizer_actor.zero_grad()
     pred_actions = self.actor(states)
     loss_theta = torch.mean(-self.critic(torch.cat([states, pred_actions], dim=1)))
     loss_theta.backward()
     
-    self.optimizer_actor.zero_grad()
     self.optimizer_actor.step()
     
     

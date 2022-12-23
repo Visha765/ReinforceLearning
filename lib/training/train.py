@@ -7,7 +7,7 @@ def Train(env, agent, end_step, interval, path):
     # env.render()
     action = agent.select_exploratory_action(state, step)
     next_state, reward, done, info = env.step(action)
-    agent.train(state, action, next_state, reward, done)
+    agent.train(state, action, next_state, reward, done, step)
     state = next_state
     if done:
       state = env.reset()

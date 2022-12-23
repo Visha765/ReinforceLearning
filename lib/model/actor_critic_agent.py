@@ -12,8 +12,9 @@ from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
-    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005 ,actor_interval=2, sigma_target=0.2, c=0.5):
+    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_target=0.2, c=0.5):
     self.tau = (-2, 2)
+    self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     self.buffer = ReplayBuffer(buffer_size)
     self.batch_size = batch_size
@@ -25,12 +26,12 @@ class ActorCriticAgent(Agent):
     self.sigma_target = sigma_target
     self.c = c
     
-    self.actor = ActorNet(2, 1)
-    self.actor_target = ActorNet(2, 1)
-    self.critic1 = CriticNet(2, 1)
-    self.critic2 = CriticNet(2, 1)
-    self.critic1_target = CriticNet(2, 1)
-    self.critic2_target = CriticNet(2, 1)
+    self.actor = ActorNet(2, 1).to(self.device)
+    self.actor_target = ActorNet(2, 1).to(self.device)
+    self.critic1 = CriticNet(2, 1).to(self.device)
+    self.critic2 = CriticNet(2, 1).to(self.device)
+    self.critic1_target = CriticNet(2, 1).to(self.device)
+    self.critic2_target = CriticNet(2, 1).to(self.device)
     
     self.criterion_critic = nn.MSELoss()
     self.optimizer_actor = torch.optim.Adam(self.actor.parameters(), lr=sigma_lr)
@@ -63,20 +64,13 @@ class ActorCriticAgent(Agent):
     D = (self.tau[1] - self.tau[0]) * self.sigma_beta/2
     return self.select_action(state) + np.random.normal(0, D**2)
 
-  def train(self, state, action, next_state, reward, done, \
-      current_step):
+  def train(self, state, action, next_state, reward, done, current_step):
     state = xy2theta(state)
     next_state = xy2theta(next_state)
     self.buffer.add(state, action, next_state, reward, done)
     
-    states, actions, next_states, rewards, dones = [self.list2tensor(i) for i in self.buffer.sample(self.batch_size)]
-    
-    # states = self.list2tensor(states)
-    # actions = self.list2tensor(actions)
-    # next_states = self.list2tensor(next_states)
-    # rewards = self.list2tensor(rewards)
-    # dones_rev = self.list2tensor(np.logical_not(dones))
-    dones_rev = torch.tensor(list(map(lambda x: not x, dones)))
+    states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
+    dones_rev = torch.tensor(list(map(lambda x: not x, dones)), device=self.device)
     
     ## critic    
     self.optimizer_critic1.zero_grad()
@@ -104,7 +98,7 @@ class ActorCriticAgent(Agent):
     loss_omega2.backward(retain_graph=True)
     self.optimizer_critic2.step()
     
-    
+  
     ## actor    
     # Delayed Policy Update
     if (current_step//self.actor_interval == 0): 
@@ -126,5 +120,5 @@ class ActorCriticAgent(Agent):
   def list2tensor(self, x):
     if not isinstance(x, np.ndarray):
       x = np.array(x)
-    return torch.Tensor(x)
+    return torch.Tensor(x, device=self.device)
     

@@ -1,7 +1,6 @@
 import numpy as np
 import sys, os
-import re
-import glob
+import torch
 import gym
 
 from lib.training.train import Train
@@ -16,6 +15,9 @@ def Worker(d):
     agent = d.agent()
     env.seed(d.train_seed)
     np.random.seed(d.train_seed)
+    torch.manual_seed(d.train_seed)
+    torch.cuda.manual_seed(d.train_seed)
+    
     # save directory
     path = f"out/{d.dir_name}"
     if not os.path.exists('out'):

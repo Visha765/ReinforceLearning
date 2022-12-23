@@ -14,16 +14,16 @@ class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "ActorCritic" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 10000 # 学習最大ステップ
+    train_step = 1000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
-    interval = 1000 # 状態を保存する間隔
-    episode = 10 # 評価のエピソード数
+    interval = 50 # 状態を保存する間隔
+    episode = 20 # 評価のエピソード数
     eval_step = 5000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
     gamma = 0.99 # 減衰率
 
     buffer_size = train_step
-    batch_size = 32
+    batch_size = 256
     
     def __init__(self, train_seed):
         self.train_seed = train_seed

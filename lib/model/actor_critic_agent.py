@@ -39,7 +39,8 @@ class ActorCriticAgent(Agent):
     
 
   def save_models(self, current_step, path):
-    filename = "log_step{:07d}.pickle".format(current_step)
+    # filename = "log_step{:07d}.pickle".format(current_step)
+    filename = f"log_step{current_step}.pickle"
     tmp = copy.deepcopy(self.buffer)
     self.buffer = []
     with open(os.path.join(path, filename), 'wb') as f:

@@ -24,9 +24,9 @@ class ActorCriticAgent(Agent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     n, m = 2, 1
-    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
-    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
-    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.actor = Actor(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
+    self.critic1 = Critic(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.critic2 = Critic(n=m, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):
@@ -67,7 +67,7 @@ class ActorCriticAgent(Agent):
 
 
     #Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states)
+    next_policy_actions = self.actor.target_policy_sr(next_states).to(self.device)
     # Clipped Double Q-Learning
     Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
     Q2 = self.critic2.target_estimate(next_states, next_policy_actions)

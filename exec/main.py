@@ -18,7 +18,7 @@ class params:
     train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 20 # 評価のエピソード数
-    eval_step = 5000 # 評価最大ステップ数
+    eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
 
     buffer_size = train_step
@@ -31,7 +31,8 @@ class params:
     def agent(self):
         return ActorCriticAgent(self.buffer_size, self.batch_size)
     
-train_seeds = [11, 13, 17, 19, 23]
+# train_seeds = [11, 13, 17, 19, 23]
+train_seeds = [11]
 conditions = [params(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     ### Visuallize ###
     label_list = ["TD3"]
     saved_steps = [i for i in range(0, params.train_step+1, params.interval)]
-    # filename = "ActorCritic_TD3"
+    filename = "ActorCritic_TD3"
     LinePlot(data_list=data_list, label_list=label_list, x=saved_steps,
-            filename=params.filename, path="out")
+            filename=filename, path="out")
 

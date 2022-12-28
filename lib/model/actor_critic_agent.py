@@ -24,9 +24,9 @@ class ActorCriticAgent(Agent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     n, m = 2, 1
-    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c).to(self.device)
-    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau).to(self.device)
-    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau).to(self.device)
+    self.actor = Actor(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
+    self.critic1 = Critic(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.critic2 = Critic(n=m, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):

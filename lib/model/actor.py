@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from lib.util.custom_tanh import *
 
@@ -23,16 +22,16 @@ class ActorNet(nn.Module):
     
     
 class Actor():
-  def __init__(self, sigma_lr=3*1e-4, target_tau=0.005, sigma_target=0.2, c=0.5) -> None:
+  def __init__(self, n=2, m=1, sigma_lr=3*1e-4, target_tau=0.005, sigma_target=0.2, c=0.5) -> None:
     self.tau = [-2, 2]
         
     self.target_tau = target_tau
     self.c = c
     self.sigma_target = sigma_target
     
-    self.net = ActorNet(2, 1)
-    self.net_target = ActorNet(2, 1)
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
+    self.net = ActorNet(n, m)
+    self.net_target = ActorNet(n, m)
+    self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
     
   def policy(self, states):
     return self.net(states)

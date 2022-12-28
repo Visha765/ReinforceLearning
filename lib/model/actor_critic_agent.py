@@ -16,30 +16,17 @@ class ActorCriticAgent(Agent):
     self.tau = (-2, 2)
     self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-    self.buffer = ReplayBuffer(buffer_size)
-    self.batch_size = batch_size
-    self.gamma = gamma
+    self.actor_interval = actor_interval
     self.sigma_beta = sigma_beta
     self.T_expl = T_expl
-    self.target_tau = target_tau
-    self.actor_interval = actor_interval
-    self.sigma_target = sigma_target
-    self.c = c
+    self.gamma = gamma
     
-    # self.actor = ActorNet(2, 1).to(self.device)
-    # self.actor_target = ActorNet(2, 1).to(self.device)
-    self.actor = Actor()
-    # self.critic1 = CriticNet(2, 1).to(self.device)
-    # self.critic2 = CriticNet(2, 1).to(self.device)
-    # self.critic1_target = CriticNet(2, 1).to(self.device)
-    # self.critic2_target = CriticNet(2, 1).to(self.device)
-    self.critic1 = Critic()
-    self.critic2 = Critic()
-    
-    # self.criterion_critic = nn.MSELoss()
-    # self.optimizer_actor = torch.optim.Adam(self.actor.parameters(), lr=sigma_lr)
-    # self.optimizer_critic1 = torch.optim.Adam(self.critic1.parameters(), lr=sigma_lr)
-    # self.optimizer_critic2 = torch.optim.Adam(self.critic2.parameters(), lr=sigma_lr)
+    self.batch_size = batch_size
+    self.buffer = ReplayBuffer(buffer_size)
+    n, m = 2, 1
+    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
+    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):
@@ -59,7 +46,7 @@ class ActorCriticAgent(Agent):
   def select_action(self, state):
     state = xy2theta(state)
     states = self.list2tensor([state,])
-    return self.actor.predict(states).detach().numpy()[0] #tensor -> ndarray
+    return self.actor.policy(states).detach().numpy()[0] #tensor -> ndarray
   
   def select_exploratory_action(self, state, current_step):
     if current_step < self.T_expl:
@@ -77,59 +64,23 @@ class ActorCriticAgent(Agent):
     # sample exp arrays from buffer
     states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
     dones_rev = torch.tensor(list(map(lambda x: not x, dones)), device=self.device)
-  
-    ## critic    
-    # self.optimizer_critic1.zero_grad()
-    # self.optimizer_critic2.zero_grad()
-    # Target Policy Smoothing Regularization
-    # noises =  np.random.normal(0, self.sigma_target)
-    # noises = self.list2tensor(np.clip(noises, -self.c, self.c)).view(-1,1)
-    # next_pred_actions = (self.actor_target(next_states) + noises).clip(*self.tau)
-    next_pred_actions = self.actor.pred_actions(next_states)
-    
+
+
+    #Target Policy Smoothing Regularization
+    next_policy_actions = self.actor.target_policy_sr(next_states)
     # Clipped Double Q-Learning
-    # Q_actor1 = self.critic1_target(torch.cat([next_states, next_pred_actions], dim=1))
-    # Q_actor2 = self.critic2_target(torch.cat([next_states, next_pred_actions], dim=1))
-    Q1 = self.critic1.target_estimate(next_states, next_pred_actions)
-    Q2 = self.critic2.target_estimate(next_states, next_pred_actions)
-    # Q_min = torch.tensor(list(map(lambda q1, q2: min(q1,q2), Q_actor1, Q_actor2)))
-    # delta = rewards.view(-1,1) \
-    #   + self.gamma * torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1))
-    
+    Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
+    Q2 = self.critic2.target_estimate(next_states, next_policy_actions)    
     delta = Critic.delta(Q1, Q2, rewards, dones_rev, self.gamma)
       
-    # Q1 = self.critic1(torch.cat([states, actions], dim=1))
-    # Q2 = self.critic2(torch.cat([states, actions], dim=1))
-    
-    # loss_omega1 = self.criterion_critic(delta, Q1)    
-    # loss_omega1.backward(retain_graph=True)
-    # self.optimizer_critic1.step()
-    
-    # loss_omega2 = self.criterion_critic(delta, Q2)
-    # loss_omega2.backward(retain_graph=True)
-    # self.optimizer_critic2.step()
-    
     self.critic1.loss_optimize(states, actions, delta)
     self.critic2.loss_optimize(states, actions, delta)
     
-  
-    ## actor    
     # Delayed Policy Update
     if (current_step//self.actor_interval == 0): 
-      # self.optimizer_actor.zero_grad()
-      # pred_actions = self.actor(states)
-      # loss_theta = (-self.critic1(torch.cat([states, pred_actions], dim=1))).mean()
-      # loss_theta.backward()
-      # self.optimizer_actor.step()
       self.actor.loss_optimize(states, self.critic1)
-      
-      # for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
-      #       target_param.data.copy_(target_param.data * (1.0 - self.target_tau) + param.data * self.target_tau)
+      # Target Actor & Target Critic
       self.actor.update_target_params()
-      # for target_param, param in zip(self.critic1_target.parameters(), self.critic1.parameters()):
-      #       target_param.data.copy_(target_param.data * (1.0 - self.target_tau) + param.data * self.target_tau)
-      # for target_param, param in zip(self.critic2_target.parameters(), self.critic2.parameters()):
-      #       target_param.data.copy_(target_param.data * (1.0 - self.target_tau) + param.data * self.target_tau)
       self.critic1.update_target_params()
       self.critic2.update_target_params()
     

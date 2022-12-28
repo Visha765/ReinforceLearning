@@ -25,34 +25,31 @@ class ActorNet(nn.Module):
 class Actor():
   def __init__(self, sigma_lr=3*1e-4, target_tau=0.005, sigma_target=0.2, c=0.5) -> None:
     self.tau = [-2, 2]
-    
+        
     self.target_tau = target_tau
     self.c = c
     self.sigma_target = sigma_target
-  
     
     self.net = ActorNet(2, 1)
     self.net_target = ActorNet(2, 1)
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
-  def predict(self, states):
+  def policy(self, states):
     return self.net(states)
   
   # Target Policy Smoothing Regularization
-  def pred_actions(self, states):
+  def target_policy_sr(self, states):
     noises =  np.random.normal(0, self.sigma_target)
-    # noises = self.list2tensor(np.clip(noises, -self.c, self.c)).view(-1,1)
     noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1)
-    pred_actions = self.net_target(states)
-    pred_actions = (pred_actions + noises).clip(*self.tau)
-    return pred_actions
+    policy_actions = self.net_target(states)
+    policy_actions = (policy_actions + noises).clip(*self.tau)
+    return policy_actions
   
   def loss_optimize(self, states, critic):
     self.optimizer.zero_grad()
-    pred_actions = self.predict(states)
-    # Q_1 = self.critic1(torch.cat([states, pred_actions], dim=1))
-    Q_1 = critic.estimate(states, pred_actions)
-    loss = (-Q_1).mean()
+    policy_actions = self.policy(states)
+    Q = critic.estimate(states, policy_actions)
+    loss = (-Q).mean()
     loss.backward()
     self.optimizer.step()
     

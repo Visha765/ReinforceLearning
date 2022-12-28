@@ -31,13 +31,9 @@ def Worker(d):
     
     ### Evaluation ###
     print('-'*10, "start Evaluation", d.train_seed, '-'*10)
-    
-    # files = glob.glob(os.path.join(path, "*.pickle"))
-    # files = [os.path.split(file)[1] for file in files]
-    # files.sort()
+
     rewards_list = []
     for saved_step in range(0, d.train_step+1, d.interval):
-    # for file in files:
         filename = f"log_step{saved_step}.pickle"
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)

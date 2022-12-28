@@ -11,7 +11,7 @@ from lib.model.critic import Critic
 from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
-  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
+  def __init__(self, buffer_size, batch_size, sigma_lr=0.1, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_target=0.2, c=0.5):
     self.tau = (-2, 2)
     self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -24,9 +24,9 @@ class ActorCriticAgent(Agent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     n, m = 2, 1
-    self.actor = Actor(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
-    self.critic1 = Critic(n=n, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
-    self.critic2 = Critic(n=m, m=m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
+    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):

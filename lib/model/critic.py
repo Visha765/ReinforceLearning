@@ -24,7 +24,7 @@ class CriticNet(nn.Module):
     return y
 
 class Critic():
-  def __init__(self, n=2, m=1, sigma_lr=3*1e-4, target_tau=0.005) -> None:
+  def __init__(self, n, m, sigma_lr=3*1e-4, target_tau=0.005) -> None:
     self.target_tau = target_tau
     
     self.net = CriticNet(n, m)

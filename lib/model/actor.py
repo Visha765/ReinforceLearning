@@ -48,9 +48,10 @@ class Actor():
     self.optimizer.zero_grad()
     policy_actions = self.policy(states)
     Q = critic.estimate(states, policy_actions)
-    loss = -1*Q.mean()
+    loss = -Q.mean()
     loss.backward()
     self.optimizer.step()
+    
     
   def update_target_params(self):
     for target_param, param in zip(self.net_target.parameters(), self.net.parameters()):

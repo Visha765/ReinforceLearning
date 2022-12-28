@@ -6,8 +6,8 @@ import copy
 
 from lib.model.agent import Agent
 from lib.model.replay_buffer import ReplayBuffer
-from lib.model.actor import ActorNet, Actor
-from lib.model.critic import CriticNet, Critic
+from lib.model.actor import Actor
+from lib.model.critic import Critic
 from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
@@ -24,9 +24,9 @@ class ActorCriticAgent(Agent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     n, m = 2, 1
-    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
-    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
-    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c).to(self.device)
+    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau).to(self.device)
+    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau).to(self.device)
     
 
   def save_models(self, current_step, path):
@@ -67,11 +67,11 @@ class ActorCriticAgent(Agent):
 
 
     #Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states)
+    next_policy_actions = self.actor.target_policy_sr(next_states).to(self.device)
     # Clipped Double Q-Learning
-    Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
-    Q2 = self.critic2.target_estimate(next_states, next_policy_actions)    
-    delta = Critic.delta(Q1, Q2, rewards, dones_rev, self.gamma)
+    Q1 = self.critic1.target_estimate(next_states, next_policy_actions).to(self.device)
+    Q2 = self.critic2.target_estimate(next_states, next_policy_actions).to(self.device)    
+    delta = Critic.delta(Q1, Q2, rewards, dones_rev, self.gamma).to(self.device)
       
     self.critic1.loss_optimize(states, actions, delta)
     self.critic2.loss_optimize(states, actions, delta)

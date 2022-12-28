@@ -24,7 +24,7 @@ class CriticNet(nn.Module):
     return y
 
 class Critic():
-  def __init__(self, n=2, m=1, sigma_lr=3*1e-4, target_tau=0.005) -> None:
+  def __init__(self, n, m, sigma_lr=3*1e-4, target_tau=0.005) -> None:
     self.target_tau = target_tau
     
     self.net = CriticNet(n, m)
@@ -42,10 +42,9 @@ class Critic():
   
   def loss_optimize(self, states, actions, delta):
     self.optimizer.zero_grad()
-    
     Q = self.estimate(states, actions)
     loss = self.criterion(delta, Q)    
-    loss.backward(retain_graph=True)
+    loss.backward()
     self.optimizer.step()
     
   def update_target_params(self):

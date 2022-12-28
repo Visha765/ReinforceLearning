@@ -49,7 +49,7 @@ class Actor():
     self.optimizer.zero_grad()
     policy_actions = self.policy(states)
     Q = critic.estimate(states, policy_actions)
-    loss = (-Q).mean()
+    loss = -1*Q.mean()
     loss.backward()
     self.optimizer.step()
     

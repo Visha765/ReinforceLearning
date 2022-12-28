@@ -6,12 +6,12 @@ import copy
 
 from lib.model.agent import Agent
 from lib.model.replay_buffer import ReplayBuffer
-from lib.model.actor import ActorNet, Actor
-from lib.model.critic import CriticNet, Critic
+from lib.model.actor import Actor
+from lib.model.critic import Critic
 from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
-  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-2, \
+  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_target=0.2, c=0.5):
     self.tau = (-2, 2)
     self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -70,7 +70,7 @@ class ActorCriticAgent(Agent):
     next_policy_actions = self.actor.target_policy_sr(next_states)
     # Clipped Double Q-Learning
     Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
-    Q2 = self.critic2.target_estimate(next_states, next_policy_actions)    
+    Q2 = self.critic2.target_estimate(next_states, next_policy_actions)
     delta = Critic.delta(Q1, Q2, rewards, dones_rev, self.gamma)
       
     self.critic1.loss_optimize(states, actions, delta)

@@ -42,10 +42,9 @@ class Critic():
   
   def loss_optimize(self, states, actions, delta):
     self.optimizer.zero_grad()
-    
     Q = self.estimate(states, actions)
     loss = self.criterion(delta, Q)    
-    loss.backward(retain_graph=True)
+    loss.backward()
     self.optimizer.step()
     
   def update_target_params(self):

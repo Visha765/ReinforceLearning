@@ -30,7 +30,7 @@ class Critic():
     self.net = CriticNet(n, m)
     self.net_target = CriticNet(n, m)
     self.criterion = nn.MSELoss()
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
+    self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
     
   def estimate(self, states, actions):
     x = torch.cat([states, actions], dim=1)

@@ -12,9 +12,9 @@ from lib.model.actor_critic_agent import ActorCriticAgent
 @dataclass
 class params:
     env_name = "Pendulum-v0" # 環境名
-    agent_name = "ActorCritic" # エージェント名
+    agent_name = "TD3" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 10000 #20000 # 学習最大ステップ
+    train_step = 30000 #20000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
     interval = 1000 # 状態を保存する間隔
     episode = 20 # 評価のエピソード数
@@ -22,7 +22,7 @@ class params:
     eval_seed = 0 # 評価環境のseed値
 
     buffer_size = train_step
-    batch_size =128 # 256
+    batch_size = 256
     
     def __init__(self, train_seed):
         self.train_seed = train_seed

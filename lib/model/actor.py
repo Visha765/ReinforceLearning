@@ -30,7 +30,7 @@ class Actor():
     
     self.net = ActorNet(dim_state, dim_action)
     self.net_target = ActorNet(dim_state, dim_action)
-    self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
   def policy(self, states):
     return self.net(states)

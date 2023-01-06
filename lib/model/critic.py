@@ -30,7 +30,7 @@ class Critic():
     self.net = CriticNet(dim_state, dim_action)
     self.net_target = CriticNet(dim_state, dim_action)
     self.criterion = nn.MSELoss()
-    self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
   def estimate(self, states, actions):
     x = torch.cat([states, actions], dim=1)
@@ -53,7 +53,9 @@ class Critic():
   
   @classmethod
   def delta(cls, Q1, Q2, rewards, dones_rev, gamma = 0.99):
-    Q_min = torch.tensor(list(map(lambda q1, q2: min(q1,q2), Q1, Q2)))
-    delta = rewards.view(-1,1) \
-      + torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1)) * gamma
-    return delta
+    with torch.no_grad():
+      # Q_min = torch.tensor(list(map(lambda q1, q2: min(q1,q2), Q1, Q2)))
+      Q_min = torch.minimum(Q1, Q2)
+      delta = rewards.view(-1,1) \
+        + torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1)) * gamma
+      return delta

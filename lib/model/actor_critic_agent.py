@@ -80,7 +80,7 @@ class ActorCriticAgent(Agent):
     self.critic2.loss_optimize(states, actions, delta)
     
     # Delayed Policy Update
-    if (current_step//self.actor_interval == 0): 
+    if (current_step % self.actor_interval == 0): 
       self.actor.loss_optimize(states, self.critic1)
       # Target Actor & Target Critic
       self.actor.update_target_params()

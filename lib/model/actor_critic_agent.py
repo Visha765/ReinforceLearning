@@ -12,7 +12,7 @@ from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
-    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_target=0.2, c=0.5):
+    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=1, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
     self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
@@ -23,10 +23,10 @@ class ActorCriticAgent(Agent):
     
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
-    n, m = 2, 1
-    self.actor = Actor(n, m, sigma_lr=sigma_lr, target_tau=target_tau, sigma_target=sigma_target, c=c)
-    self.critic1 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
-    self.critic2 = Critic(n, m, sigma_lr=sigma_lr, target_tau=target_tau)
+    dim_state, dim_action = 2, 1
+    self.actor = Actor(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
+    self.critic1 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.critic2 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):
@@ -60,6 +60,9 @@ class ActorCriticAgent(Agent):
     state = xy2theta(state)
     next_state = xy2theta(next_state)
     self.buffer.add(state, action, next_state, reward, done)
+    
+    if (len(self.buffer)) < self.batch_size:
+      return 
     
     # sample exp arrays from buffer
     states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]

@@ -5,13 +5,13 @@ import torch.nn as nn
 from lib.util.custom_tanh import *
 
 class ActorNet(nn.Module):
-  def __init__(self, n, m):
+  def __init__(self, dim_state, dim_action, hidden1_size=256):
     super(ActorNet, self).__init__()
     self.flatten = nn.Flatten()
     self.stack = nn.Sequential(
-      nn.Linear(n, 256),
+      nn.Linear(dim_state, hidden1_size),
       nn.ReLU(),
-      nn.Linear(256, m),
+      nn.Linear(hidden1_size, dim_action),
       Lambda(custom_tanh.apply)
     )
 
@@ -21,15 +21,15 @@ class ActorNet(nn.Module):
     return y
     
 class Actor():
-  def __init__(self, n, m, sigma_lr=3*1e-4, target_tau=0.005, sigma_target=0.2, c=0.5) -> None:
+  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5) -> None:
     self.tau = [-2, 2]
         
     self.target_tau = target_tau
     self.c = c
-    self.sigma_target = sigma_target
+    self.sigma_sr = sigma_sr
     
-    self.net = ActorNet(n, m)
-    self.net_target = ActorNet(n, m)
+    self.net = ActorNet(dim_state, dim_action)
+    self.net_target = ActorNet(dim_state, dim_action)
     self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
     
   def policy(self, states):
@@ -37,7 +37,7 @@ class Actor():
   
   # Target Policy Smoothing Regularization
   def target_policy_sr(self, states):
-    noises =  np.random.normal(0, self.sigma_target)
+    noises =  np.random.normal(0, self.sigma_sr)
     noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1)
     policy_actions = self.net_target(states)
     policy_actions = (policy_actions + noises).clip(*self.tau)

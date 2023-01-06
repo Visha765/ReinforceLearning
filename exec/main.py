@@ -22,7 +22,7 @@ class params:
     eval_seed = 0 # 評価環境のseed値
 
     buffer_size = train_step
-    batch_size = 256
+    batch_size =128 # 256
     
     def __init__(self, train_seed):
         self.train_seed = train_seed
@@ -31,7 +31,7 @@ class params:
     def agent(self):
         return ActorCriticAgent(self.buffer_size, self.batch_size)
     
-train_seeds = [11]
+train_seeds = [0]
 # train_seeds = [11, 13, 17, 19, 23]
 conditions = [params(train_seed) for train_seed in train_seeds]
 

@@ -6,15 +6,15 @@ from lib.util.custom_tanh import *
 
 
 class CriticNet(nn.Module):
-  def __init__(self, n, m):
+  def __init__(self, dim_state, dim_action, hidden1_size=256, hidden2_size=256):
     super(CriticNet, self).__init__()
     self.flatten = nn.Flatten()
     self.stack = nn.Sequential(
-      nn.Linear(n + m, 256),
+      nn.Linear(dim_state+dim_action, hidden1_size),
       nn.ReLU(),
-      nn.Linear(256, 256),
+      nn.Linear(hidden1_size, hidden2_size),
       nn.ReLU(),
-      nn.Linear(256, 1),
+      nn.Linear(hidden2_size, 1),
       Lambda(custom_tanh.apply),
     )
 
@@ -24,11 +24,11 @@ class CriticNet(nn.Module):
     return y
 
 class Critic():
-  def __init__(self, n, m, sigma_lr=3*1e-4, target_tau=0.005) -> None:
+  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005) -> None:
     self.target_tau = target_tau
     
-    self.net = CriticNet(n, m)
-    self.net_target = CriticNet(n, m)
+    self.net = CriticNet(dim_state, dim_action)
+    self.net_target = CriticNet(dim_state, dim_action)
     self.criterion = nn.MSELoss()
     self.optimizer = torch.optim.SGD(self.net.parameters(), lr=sigma_lr)
     
@@ -43,7 +43,7 @@ class Critic():
   def loss_optimize(self, states, actions, delta):
     self.optimizer.zero_grad()
     Q = self.estimate(states, actions)
-    loss = self.criterion(Q, delta)    
+    loss = self.criterion(delta, Q)
     loss.backward()
     self.optimizer.step()
     
@@ -55,5 +55,5 @@ class Critic():
   def delta(cls, Q1, Q2, rewards, dones_rev, gamma = 0.99):
     Q_min = torch.tensor(list(map(lambda q1, q2: min(q1,q2), Q1, Q2)))
     delta = rewards.view(-1,1) \
-      + gamma * torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1))
+      + torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1)) * gamma
     return delta

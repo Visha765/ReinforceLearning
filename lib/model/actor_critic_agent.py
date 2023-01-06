@@ -66,7 +66,7 @@ class ActorCriticAgent(Agent):
     
     # sample exp arrays from buffer
     states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
-    dones_rev = torch.tensor(list(map(lambda x: not x, dones)), device=self.device)
+    dones_rev = torch.tensor(list(map(lambda x: not x, dones)), device=self.device, dtype=torch.float32)
 
 
     #Target Policy Smoothing Regularization
@@ -89,6 +89,6 @@ class ActorCriticAgent(Agent):
     
   def list2tensor(self, x):
     if not isinstance(x, np.ndarray):
-      x = np.array(x)
+      x = np.array(x, dtype=np.float32)
     return torch.Tensor(x, device=self.device)
     

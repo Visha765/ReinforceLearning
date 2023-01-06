@@ -14,7 +14,7 @@ class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "TD3" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 30000 #20000 # 学習最大ステップ
+    train_step = 100000 #20000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
     interval = 1000 # 状態を保存する間隔
     episode = 20 # 評価のエピソード数
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     ### Visuallize ###
     label_list = ["TD3"]
     saved_steps = [i for i in range(0, params.train_step+1, params.interval)]
-    filename = "ActorCritic_TD3"
+    filename = "TD3"
     LinePlot(data_list=data_list, label_list=label_list, x=saved_steps,
             filename=filename, path="out")
 

@@ -12,7 +12,7 @@ from lib.util.xy2theta import xy2theta
 
 class ActorCriticAgent(Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
-    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=1, sigma_sr=0.2, c=0.5):
+    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
     self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     

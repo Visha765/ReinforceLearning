@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import sys, os
 import torch
 import gym
@@ -15,6 +16,7 @@ def Worker(d):
     agent = d.agent()
     env.seed(d.train_seed)
     np.random.seed(d.train_seed)
+    random.seed(d.train_seed)
     torch.manual_seed(d.train_seed)
     torch.cuda.manual_seed(d.train_seed)
     

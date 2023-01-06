@@ -20,7 +20,6 @@ class ActorNet(nn.Module):
     y = self.stack(x)
     return y
     
-    
 class Actor():
   def __init__(self, n, m, sigma_lr=3*1e-4, target_tau=0.005, sigma_target=0.2, c=0.5) -> None:
     self.tau = [-2, 2]
@@ -51,7 +50,6 @@ class Actor():
     loss = -Q.mean()
     loss.backward()
     self.optimizer.step()
-    
     
   def update_target_params(self):
     for target_param, param in zip(self.net_target.parameters(), self.net.parameters()):

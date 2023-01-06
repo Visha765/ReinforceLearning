@@ -23,7 +23,6 @@ class custom_tanh(torch.autograd.Function):
 
 # wrapper
 class Lambda(nn.Module):
-
     def __init__(self, func):
         super().__init__()
         self.func = func

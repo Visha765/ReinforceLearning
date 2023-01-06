@@ -19,4 +19,4 @@ def LinePlot(data_list, label_list , x, filename, path):
   plt.legend(loc="lower right", fontsize=12)
   
   plt.savefig(os.path.join(path, filename)+'.png', format="png")
-  plt.show()
+  # plt.show()

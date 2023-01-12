@@ -7,10 +7,7 @@ from lib.training.worker import Worker
 from lib.util.transform import Transform
 from lib.util.line_plot import LinePlot
 from lib.model.TD3_agent import TD3Agent
-from lib.model.TD3_agent_without_TATC import TD3Agent_withoutTATC
-from lib.model.TD3_agent_without_TPSR import TD3Agent_withoutTPSR
-from lib.model.TD3_agent_without_DPU import TD3Agent_withoutDPU
-from lib.model.TD3_agent_without_CDQ import TD3Agent_withoutCDQ
+from lib.model.TD3_agent_ablation import TD3Agent_withoutTATC, TD3Agent_withoutTPSR, TD3Agent_withoutDPU, TD3Agent_withoutCDQ
 
 ### Condition ###
 @dataclass

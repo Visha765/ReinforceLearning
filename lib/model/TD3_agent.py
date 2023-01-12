@@ -12,7 +12,7 @@ from lib.util.xy2theta import xy2theta
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class TD3Agent_Base(Agent):
+class TD3Agent(Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
@@ -59,34 +59,6 @@ class TD3Agent_Base(Agent):
     return np.clip(action + noise, *self.tau)
 
   def train(self, state, action, next_state, reward, done, current_step):
-    pass
-    
-  def list2tensor(self, x):
-    x = np.array(x, dtype=np.float32)
-    return torch.Tensor(x).to(device)
-  
-  def add_buffer(self, state, action, next_state, reward, done):
-    # add exp into buffer
-    state = xy2theta(state)
-    next_state = xy2theta(next_state)
-    self.buffer.add(state, action, next_state, reward, done)
-    
-  def sample_buffer(self):
-    # sample exp arrays from buffer
-    if (len(self.buffer)) < self.batch_size: raise
-    states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
-    dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
-    return states, actions, next_states, rewards, dones_rev
-    
-    
-class TD3Agent(TD3Agent_Base):
-  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
-      gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
-    
-    super().__init__(buffer_size, batch_size, sigma_lr=sigma_lr, \
-        gamma=gamma, sigma_beta=sigma_beta, T_expl=T_expl, target_tau=target_tau, actor_interval=actor_interval, sigma_sr=sigma_sr, c=c)
-
-  def train(self, state, action, next_state, reward, done, current_step):
     self.add_buffer(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
@@ -110,3 +82,19 @@ class TD3Agent(TD3Agent_Base):
       self.critic1.update_target_params()
       self.critic2.update_target_params()
     
+  def list2tensor(self, x):
+    x = np.array(x, dtype=np.float32)
+    return torch.Tensor(x).to(device)
+  
+  def add_buffer(self, state, action, next_state, reward, done):
+    # add exp into buffer
+    state = xy2theta(state)
+    next_state = xy2theta(next_state)
+    self.buffer.add(state, action, next_state, reward, done)
+    
+  def sample_buffer(self):
+    # sample exp arrays from buffer
+    if (len(self.buffer)) < self.batch_size: raise
+    states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
+    dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
+    return states, actions, next_states, rewards, dones_rev

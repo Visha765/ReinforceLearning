@@ -34,7 +34,6 @@ class params:
       
   def agent(self):
     pass
-    # return TD3Agent(self.buffer_size, self.batch_size)
   
   
 class params_TD3(params):

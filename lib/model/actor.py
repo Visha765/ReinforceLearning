@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import copy
 
 from lib.util.custom_tanh import *
 
@@ -29,7 +30,7 @@ class Actor():
     self.sigma_sr = sigma_sr
     
     self.net = ActorNet(dim_state, dim_action)
-    self.net_target = ActorNet(dim_state, dim_action)
+    self.net_target = copy.deepcopy(self.net)
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
   def policy(self, states):

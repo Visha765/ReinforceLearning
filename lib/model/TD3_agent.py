@@ -45,14 +45,16 @@ class TD3Agent_Base(Agent):
   def select_action(self, state):
     state = xy2theta(state)
     states = self.list2tensor([state,])
-    return self.actor.policy(states).detach().numpy()[0] #tensor -> ndarray
+    return self.actor.policy(states)[0].detach().numpy() #tensor -> ndarray
   
   def select_exploratory_action(self, state, current_step):
     if current_step < self.T_expl:
       return np.random.uniform(*self.tau, 1)
     
+    action = self.select_action(state)
     D = (self.tau[1] - self.tau[0]) * self.sigma_beta/2
-    return self.select_action(state) + np.random.normal(0, D**2)
+    noise = np.random.normal(0, D**2)
+    return np.clip(action + noise, *self.tau)
 
   def train(self, state, action, next_state, reward, done, current_step):
     pass

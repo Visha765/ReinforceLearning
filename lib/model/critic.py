@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import copy
 
 from lib.util.custom_tanh import *
 
@@ -28,7 +29,7 @@ class Critic():
     self.target_tau = target_tau
     
     self.net = CriticNet(dim_state, dim_action)
-    self.net_target = CriticNet(dim_state, dim_action)
+    self.net_target = copy.deepcopy(self.net)
     self.criterion = nn.MSELoss()
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     

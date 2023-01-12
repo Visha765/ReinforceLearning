@@ -35,6 +35,16 @@ class Actor():
   def policy(self, states):
     return self.net(states)
   
+  def target_policy(self, states):
+    return self.net_target(states)
+  
+  # Policy Smoothing Regularization
+  def policy_sr(self, states):
+    noises =  np.random.normal(0, self.sigma_sr)
+    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1)
+    policy_actions = self.net_target(states)
+    policy_actions = (policy_actions + noises).clip(*self.tau)
+    return policy_actions
   # Target Policy Smoothing Regularization
   def target_policy_sr(self, states):
     noises =  np.random.normal(0, self.sigma_sr)

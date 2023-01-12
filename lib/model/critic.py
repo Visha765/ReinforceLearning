@@ -52,10 +52,8 @@ class Critic():
       target_param.data.copy_(target_param.data * (1.0 - self.target_tau) + param.data * self.target_tau)
   
   @classmethod
-  def delta(cls, Q1, Q2, rewards, dones_rev, gamma = 0.99):
+  def delta(cls, Q, rewards, dones_rev, gamma = 0.99):
     with torch.no_grad():
-      # Q_min = torch.tensor(list(map(lambda q1, q2: min(q1,q2), Q1, Q2)))
-      Q_min = torch.minimum(Q1, Q2)
       delta = rewards.view(-1,1) \
-        + torch.mul(dones_rev.view(-1,1), Q_min.view(-1,1)) * gamma
+        + torch.mul(dones_rev.view(-1,1), Q.view(-1,1)) * gamma
       return delta

@@ -10,11 +10,13 @@ from lib.model.actor import Actor
 from lib.model.critic import Critic
 from lib.util.xy2theta import xy2theta
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class TD3Agent_Base(Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
-    self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     
     self.actor_interval = actor_interval
     self.sigma_beta = sigma_beta
@@ -61,7 +63,7 @@ class TD3Agent_Base(Agent):
     
   def list2tensor(self, x):
     x = np.array(x, dtype=np.float32)
-    return torch.Tensor(x, device=self.device)
+    return torch.Tensor(x).to(device)
   
   def add_buffer(self, state, action, next_state, reward, done):
     # add exp into buffer
@@ -90,7 +92,7 @@ class TD3Agent(TD3Agent_Base):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states).to(self.device)
+    next_policy_actions = self.actor.target_policy_sr(next_states)
     # Clipped Double Q-Learning
     Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
     Q2 = self.critic2.target_estimate(next_states, next_policy_actions)

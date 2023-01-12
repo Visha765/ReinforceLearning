@@ -5,6 +5,7 @@ import copy
 
 from lib.util.custom_tanh import *
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class CriticNet(nn.Module):
   def __init__(self, dim_state, dim_action, hidden1_size=256, hidden2_size=256):
@@ -28,8 +29,8 @@ class Critic():
   def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005) -> None:
     self.target_tau = target_tau
     
-    self.net = CriticNet(dim_state, dim_action)
-    self.net_target = copy.deepcopy(self.net)
+    self.net = CriticNet(dim_state, dim_action).to(device)
+    self.net_target = copy.deepcopy(self.net).to(device)
     self.criterion = nn.MSELoss()
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     

@@ -5,6 +5,8 @@ import copy
 
 from lib.util.custom_tanh import *
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class ActorNet(nn.Module):
   def __init__(self, dim_state, dim_action, hidden1_size=256):
     super(ActorNet, self).__init__()
@@ -29,8 +31,8 @@ class Actor():
     self.c = c
     self.sigma_sr = sigma_sr
     
-    self.net = ActorNet(dim_state, dim_action)
-    self.net_target = copy.deepcopy(self.net)
+    self.net = ActorNet(dim_state, dim_action).to(device)
+    self.net_target = copy.deepcopy(self.net).to(device)
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
   def policy(self, states):
@@ -42,14 +44,14 @@ class Actor():
   # Policy Smoothing Regularization
   def policy_sr(self, states):
     noises =  np.random.normal(0, self.sigma_sr)
-    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1)
+    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1).to(device)
     policy_actions = self.net_target(states)
     policy_actions = (policy_actions + noises).clip(*self.tau)
     return policy_actions
   # Target Policy Smoothing Regularization
   def target_policy_sr(self, states):
     noises =  np.random.normal(0, self.sigma_sr)
-    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1)
+    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1).to(device)
     policy_actions = self.net_target(states)
     policy_actions = (policy_actions + noises).clip(*self.tau)
     return policy_actions

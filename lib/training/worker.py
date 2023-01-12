@@ -10,7 +10,7 @@ from lib.training.evaluate import Evaluate
 # d is dataclass
 def Worker(d):
     ## Training ###
-    print('-'*10, "start Train", d.train_seed, '-'*10)
+    print('-'*10, "start Train", d.agent_name, d.train_seed, '-'*10)
     
     env = gym.make(d.env_name)
     agent = d.agent()
@@ -32,7 +32,7 @@ def Worker(d):
     
     
     ### Evaluation ###
-    print('-'*10, "start Evaluation", d.train_seed, '-'*10)
+    print('-'*10, "start Evaluation", d.agent_name, d.train_seed, '-'*10)
 
     rewards_list = []
     for saved_step in range(0, d.train_step+1, d.interval):

@@ -18,7 +18,7 @@ class params:
   env_name = "Pendulum-v0" # 環境名
   agent_name = None # エージェント名
   dir_name = None # 保存先ディレクトリ
-  train_step = 1000 #20000 # 学習最大ステップ
+  train_step = 30000 #20000 # 学習最大ステップ
   train_seed = None # 学習環境のseed値
   interval = 1000 # 状態を保存する間隔
   episode = 20 # 評価のエピソード数
@@ -51,7 +51,7 @@ class params_TD3_without{option}(params):
     return TD3Agent_without{option}(self.buffer_size, self.batch_size)
   """)
 
-train_seeds = [11]
+train_seeds = [11, 13, 17]
 
 conditions = [[params_TD3(train_seed) for train_seed in train_seeds]]
 for option in options:

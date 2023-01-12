@@ -17,6 +17,13 @@ class ActorNet(nn.Module):
       nn.Linear(hidden1_size, dim_action),
       Lambda(custom_tanh.apply)
     )
+    
+    for m in self.modules():
+      if isinstance(m, nn.Linear):
+          nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+          nn.init.constant_(m.bias, 0)
+          # nn.init.normal_(m.weight, 0, 0.01)
+          # nn.init.constant_(m.bias, 0)
 
   def forward(self, x):
     x = self.flatten(x)

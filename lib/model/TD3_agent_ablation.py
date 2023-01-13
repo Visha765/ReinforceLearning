@@ -18,7 +18,7 @@ class TD3Agent_withoutTATC(TD3Agent):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.policy_sr(next_states).to(self.device)
+    next_policy_actions = self.actor.policy_sr(next_states).to(device)
     # Clipped Double Q-Learning
     Q1 = self.critic1.estimate(next_states, next_policy_actions)
     Q2 = self.critic2.estimate(next_states, next_policy_actions)
@@ -46,7 +46,7 @@ class TD3Agent_withoutTPSR(TD3Agent):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #without Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy(next_states).to(self.device)
+    next_policy_actions = self.actor.target_policy(next_states).to(device)
     # Clipped Double Q-Learning
     Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
     Q2 = self.critic2.target_estimate(next_states, next_policy_actions)
@@ -78,7 +78,7 @@ class TD3Agent_withoutDPU(TD3Agent):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states).to(self.device)
+    next_policy_actions = self.actor.target_policy_sr(next_states).to(device)
     # Clipped Double Q-Learning
     Q1 = self.critic1.target_estimate(next_states, next_policy_actions)
     Q2 = self.critic2.target_estimate(next_states, next_policy_actions)
@@ -109,7 +109,7 @@ class TD3Agent_withoutCDQ(TD3Agent):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #none of Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states).to(self.device)
+    next_policy_actions = self.actor.target_policy_sr(next_states).to(device)
     # without Clipped Double Q-Learning
     Q = self.critic1.target_estimate(next_states, next_policy_actions)
     delta = Critic.delta(Q, rewards, dones_rev, self.gamma)

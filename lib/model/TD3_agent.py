@@ -34,11 +34,11 @@ class TD3Agent(Agent):
 
   def save_models(self, current_step, path):
     filename = f"log_step{current_step}.pickle"
-    tmp = copy.deepcopy(self.buffer)
+    tmp = copy.deepcopy([self.buffer, self.critic1, self.critic2])
     self.buffer = []
     with open(os.path.join(path, filename), 'wb') as f:
       pickle.dump(self, f)
-    self.buffer = tmp
+    self.buffer, self.critic1, self.critic2 = tmp
 
   def load_models(self, path, filename):
     with open(os.path.join(path, filename), 'rb') as f:

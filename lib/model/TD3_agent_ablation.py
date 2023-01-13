@@ -3,6 +3,8 @@ import torch
 from lib.model.critic import Critic
 from lib.model.TD3_agent import TD3Agent
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 # Agent without Target Actor & Target Critic
 class TD3Agent_withoutTATC(TD3Agent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \

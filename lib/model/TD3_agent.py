@@ -48,7 +48,7 @@ class TD3Agent(Agent):
   def select_action(self, state):
     state = xy2theta(state)
     states = self.list2tensor([state,])
-    return self.actor.policy(states)[0].detach().numpy() #tensor -> ndarray
+    return self.actor.policy(states)[0].detach().cpu().numpy() #tensor -> ndarray
   
   def select_exploratory_action(self, state, current_step):
     if current_step < self.T_expl:

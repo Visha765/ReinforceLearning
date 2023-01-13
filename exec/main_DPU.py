@@ -7,7 +7,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from lib.training.worker import Worker
 from lib.util.transform import Transform
 from lib.util.line_plot import LinePlot
-from lib.model.TD3_agent import TD3Agent
+from lib.model.TD3_agent_ablation import TD3Agent_withoutDPU
+
 
 if multiprocessing.get_start_method() == 'fork':
     multiprocessing.set_start_method('spawn', force=True)
@@ -17,9 +18,9 @@ if multiprocessing.get_start_method() == 'fork':
 @dataclass
 class params:
     env_name = "Pendulum-v0" # 環境名
-    agent_name = "TD3" # エージェント名
+    agent_name = "TD3-DPU" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 500000 #20000 # 学習最大ステップ
+    train_step = 500000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 20 # 評価のエピソード数
@@ -34,10 +35,9 @@ class params:
         self.dir_name = f"{self.env_name}_{self.agent_name}_{self.train_seed}" # 保存先ディレクトリ
         
     def agent(self):
-        return TD3Agent(self.buffer_size, self.batch_size)
+        return TD3Agent_withoutDPU(self.buffer_size, self.batch_size)
     
 train_seeds = [11, 13, 17, 19, 23]
-# train_seeds = [11]
 condition = [params(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':

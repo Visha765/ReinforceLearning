@@ -25,12 +25,12 @@ class TD3Agent_withoutTATC(TD3Agent):
     Q_min = torch.minimum(Q1, Q2)
     delta = Critic.delta(Q_min, rewards, dones_rev, self.gamma)
       
-    self.critic1.loss_optimize(states, actions, delta)
-    self.critic2.loss_optimize(states, actions, delta)
+    self.critic1.loss_optimize(states, actions, delta, current_step)
+    self.critic2.loss_optimize(states, actions, delta, current_step)
     
     # Delayed Policy Update
     if (current_step % self.actor_interval == 0): 
-      self.actor.loss_optimize(states, self.critic1)
+      self.actor.loss_optimize(states, self.critic1, current_step)
 
 
 # Agent without Target Policy Smoothing Regularization
@@ -53,12 +53,12 @@ class TD3Agent_withoutTPSR(TD3Agent):
     Q_min = torch.minimum(Q1, Q2)
     delta = Critic.delta(Q_min, rewards, dones_rev, self.gamma)
       
-    self.critic1.loss_optimize(states, actions, delta)
-    self.critic2.loss_optimize(states, actions, delta)
+    self.critic1.loss_optimize(states, actions, delta, current_step)
+    self.critic2.loss_optimize(states, actions, delta, current_step)
     
     # Delayed Policy Update
     if (current_step % self.actor_interval == 0): 
-      self.actor.loss_optimize(states, self.critic1)
+      self.actor.loss_optimize(states, self.critic1, current_step)
       # Target Actor & Target Critic
       self.actor.update_target_params()
       self.critic1.update_target_params()
@@ -85,11 +85,11 @@ class TD3Agent_withoutDPU(TD3Agent):
     Q_min = torch.minimum(Q1, Q2)
     delta = Critic.delta(Q_min, rewards, dones_rev, self.gamma)
       
-    self.critic1.loss_optimize(states, actions, delta)
-    self.critic2.loss_optimize(states, actions, delta)
+    self.critic1.loss_optimize(states, actions, delta, current_step)
+    self.critic2.loss_optimize(states, actions, delta, current_step)
     
     # without Delayed Policy Update 
-    self.actor.loss_optimize(states, self.critic1)
+    self.actor.loss_optimize(states, self.critic1, current_step)
     # Target Actor & Target Critic
     self.actor.update_target_params()
     self.critic1.update_target_params()
@@ -114,11 +114,11 @@ class TD3Agent_withoutCDQ(TD3Agent):
     Q = self.critic1.target_estimate(next_states, next_policy_actions)
     delta = Critic.delta(Q, rewards, dones_rev, self.gamma)
       
-    self.critic1.loss_optimize(states, actions, delta)
+    self.critic1.loss_optimize(states, actions, delta, current_step)
     
     # Delayed Policy Update
     if (current_step % self.actor_interval == 0): 
-      self.actor.loss_optimize(states, self.critic1)
+      self.actor.loss_optimize(states, self.critic1, current_step)
       # Target Actor & Target Critic
       self.actor.update_target_params()
       self.critic1.update_target_params()

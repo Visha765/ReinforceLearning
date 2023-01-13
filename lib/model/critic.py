@@ -1,6 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import os, sys
+from collections import namedtuple
 import torch
 import torch.nn as nn
 import copy
@@ -8,6 +7,7 @@ import copy
 from lib.util.custom_tanh import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+Transition = namedtuple('Transition', ('loss', 'step'))
 
 class CriticNet(nn.Module):
   def __init__(self, dim_state, dim_action, hidden1_size=256, hidden2_size=256):
@@ -53,11 +53,11 @@ class Critic():
     x = torch.cat([states, actions], dim=1)
     return self.net_target(x)
   
-  def loss_optimize(self, states, actions, delta):
+  def loss_optimize(self, states, actions, delta, current_step):
     self.optimizer.zero_grad()
     Q = self.estimate(states, actions)
     loss = self.criterion(delta, Q)
-    self.losses.append(loss)
+    self.losses.append(Transition(loss.item(), current_step))
     loss.backward()
     self.optimizer.step()
     

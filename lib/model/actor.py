@@ -1,6 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import os, sys
+from collections import namedtuple
 import torch
 import torch.nn as nn
 import copy
@@ -8,6 +7,7 @@ import copy
 from lib.util.custom_tanh import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+Transition = namedtuple('Transition', ('loss', 'step'))
 
 class ActorNet(nn.Module):
   def __init__(self, dim_state, dim_action, hidden1_size=256):
@@ -67,12 +67,12 @@ class Actor():
     policy_actions = (policy_actions + noises).clip(*self.tau)
     return policy_actions
   
-  def loss_optimize(self, states, critic):
+  def loss_optimize(self, states, critic, current_step):
     self.optimizer.zero_grad()
     policy_actions = self.policy(states)
     Q = critic.estimate(states, policy_actions)
     loss = -Q.mean()
-    self.losses.append(loss)
+    self.losses.append(Transition(loss.item(), current_step))
     loss.backward()
     self.optimizer.step()
     

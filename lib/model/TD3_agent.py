@@ -10,6 +10,7 @@ from lib.model.replay_buffer import ReplayBuffer
 from lib.model.actor import Actor
 from lib.model.critic import Critic
 from lib.util.xy2theta import xy2theta
+from lib.util.loss_plot import LossPlot
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -34,16 +35,15 @@ class TD3Agent(Agent):
 
   def save_models(self, current_step, path):
     filename = f"log_step{current_step}.pickle"
-    tmp = copy.deepcopy([self.buffer, self.critic1, self.critic2])
-    self.buffer = []
     with open(os.path.join(path, filename), 'wb') as f:
-      pickle.dump(self, f)
-    self.buffer, self.critic1, self.critic2 = tmp
+      data = self.actor
+      pickle.dump(data, f)
 
-  def load_models(self, path, filename):
+  def load_models(self, path, saved_step):
+    filename = f"log_step{saved_step}.pickle"
     with open(os.path.join(path, filename), 'rb') as f:
-      data = pickle.load(f)
-    return data
+      actor = pickle.load(f)
+      self.actor = actor
 
   def select_action(self, state):
     state = xy2theta(state)
@@ -72,12 +72,12 @@ class TD3Agent(Agent):
     Q_min = torch.minimum(Q1, Q2)
     delta = Critic.delta(Q_min, rewards, dones_rev, self.gamma)
       
-    self.critic1.loss_optimize(states, actions, delta)
-    self.critic2.loss_optimize(states, actions, delta)
+    self.critic1.loss_optimize(states, actions, delta, current_step)
+    self.critic2.loss_optimize(states, actions, delta, current_step)
     
     # Delayed Policy Update
     if (current_step % self.actor_interval == 0): 
-      self.actor.loss_optimize(states, self.critic1)
+      self.actor.loss_optimize(states, self.critic1, current_step)
       # Target Actor & Target Critic
       self.actor.update_target_params()
       self.critic1.update_target_params()
@@ -100,12 +100,13 @@ class TD3Agent(Agent):
     dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
     return states, actions, next_states, rewards, dones_rev
     
-  def plot_loss(self, path):
-    def plot(model, title):
-      plt.plot(model.losses, marker='.')
-      plt.title(title, fontsize = 16)
-      plt.savefig(os.path.join(path, title)+'.png', format="png")
-      
-    plot(self.actor, "Actor")
-    plot(self.critic1, "Critic")
+  def plot_loss(self, interval, path):
+    def plot(model):
+      l = len(model.losses)
+      steps = [model.losses[i].loss for i in range(0, l, interval)]
+      losses = [model.losses[i].step for i in range(0, l, interval)]
+      LossPlot(losses, steps, model.__class__.__name__, path)
+    plot(self.actor)
+    plot(self.critic1)
+    
 

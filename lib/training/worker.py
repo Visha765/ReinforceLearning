@@ -28,19 +28,18 @@ def Worker(d):
         os.mkdir(path)
     
     Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
-    agent.plot_loss(path)
     env.close()
     
+    agent.plot_loss(interval=d.interval//100, path=path)
     
     ### Evaluation ###
     print('-'*10, "start Evaluation", d.agent_name, d.train_seed, '-'*10)
 
     rewards_list = []
     for saved_step in range(0, d.train_step+1, d.interval):
-        filename = f"log_step{saved_step}.pickle"
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)
-        agent = agent.load_models(path=path, filename=filename)
+        agent.load_models(path=path, saved_step=saved_step)
         rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode)
         rewards_list.append(rewards) 
         env.close()

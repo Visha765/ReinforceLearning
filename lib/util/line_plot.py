@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 def LinePlot(data_list, label_list , x, filename, path):
+  plt.figure()
   plt.rcParams['font.family'] = 'Noto Sans JP', 'Hiragino Sans'
   color_list = ['blue', 'red', 'green', 'orange', 'purple']
   

@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+import torch.multiprocessing as multiprocessing
 from dataclasses import dataclass
 import sys, os
 
@@ -9,6 +10,10 @@ from lib.util.line_plot import LinePlot
 from lib.model.TD3_agent import TD3Agent
 from lib.model.TD3_agent_ablation import TD3Agent_withoutTATC, TD3Agent_withoutTPSR, TD3Agent_withoutDPU, TD3Agent_withoutCDQ
 
+if multiprocessing.get_start_method() == 'fork':
+    multiprocessing.set_start_method('spawn', force=True)
+    print("{} setup done".format(multiprocessing.get_start_method()))
+    
 ### Condition ###
 @dataclass
 class params:

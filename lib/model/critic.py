@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import os, sys
 import torch
 import torch.nn as nn
 import copy
@@ -17,13 +19,13 @@ class CriticNet(nn.Module):
       nn.Linear(hidden1_size, hidden2_size),
       nn.ReLU(),
       nn.Linear(hidden2_size, 1),
-      Lambda(custom_tanh.apply),
+      # Lambda(custom_tanh.apply),
     )
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
         # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
@@ -41,6 +43,8 @@ class Critic():
     self.criterion = nn.MSELoss()
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
     
+    self.losses = []
+    
   def estimate(self, states, actions):
     x = torch.cat([states, actions], dim=1)
     return self.net(x)
@@ -53,6 +57,7 @@ class Critic():
     self.optimizer.zero_grad()
     Q = self.estimate(states, actions)
     loss = self.criterion(delta, Q)
+    self.losses.append(loss)
     loss.backward()
     self.optimizer.step()
     

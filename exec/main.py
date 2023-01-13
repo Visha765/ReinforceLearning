@@ -31,8 +31,8 @@ class params:
     def agent(self):
         return TD3Agent(self.buffer_size, self.batch_size)
     
-# train_seeds = [11, 13, 17, 19, 23]
-train_seeds = [11]
+train_seeds = [11, 13, 17, 19, 23]
+# train_seeds = [11]
 condition = [params(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':

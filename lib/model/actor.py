@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import os, sys
 import torch
 import torch.nn as nn
 import copy
@@ -20,8 +22,8 @@ class ActorNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-        nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
         # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
@@ -41,6 +43,8 @@ class Actor():
     self.net = ActorNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
     self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
+    
+    self.losses = []
     
   def policy(self, states):
     return self.net(states)
@@ -68,6 +72,7 @@ class Actor():
     policy_actions = self.policy(states)
     Q = critic.estimate(states, policy_actions)
     loss = -Q.mean()
+    self.losses.append(loss)
     loss.backward()
     self.optimizer.step()
     

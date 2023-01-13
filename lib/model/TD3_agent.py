@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import sys, os
 import pickle
 import torch, torch.nn as nn
@@ -98,3 +99,13 @@ class TD3Agent(Agent):
     states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
     dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
     return states, actions, next_states, rewards, dones_rev
+    
+  def plot_loss(self, path):
+    def plot(model, title):
+      plt.plot(model.losses, marker='.')
+      plt.title(title, fontsize = 16)
+      plt.savefig(os.path.join(path, title)+'.png', format="png")
+      
+    plot(self.actor, "Actor")
+    plot(self.critic1, "Critic")
+

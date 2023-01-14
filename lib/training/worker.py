@@ -3,6 +3,7 @@ import random
 import sys, os
 import torch
 import gym
+from tqdm import tqdm
 
 from lib.training.train import Train
 from lib.training.evaluate import Evaluate
@@ -28,15 +29,15 @@ def Worker(d):
         os.mkdir(path)
     
     Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
+    agent.plot_loss(interval=d.interval//100, path=path)
     env.close()
     
-    agent.plot_loss(interval=d.interval//100, path=path)
-    
+
     ### Evaluation ###
     print('-'*10, "start Evaluation", d.agent_name, d.train_seed, '-'*10)
 
     rewards_list = []
-    for saved_step in range(0, d.train_step+1, d.interval):
+    for saved_step in tqdm(range(0, d.train_step+1, d.interval)):
         env = gym.make(d.env_name)
         env.seed(d.eval_seed)
         agent.load_models(path=path, saved_step=saved_step)

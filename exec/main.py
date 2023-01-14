@@ -19,7 +19,7 @@ class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "TD3" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 500000 #20000 # 学習最大ステップ
+    train_step = 100000 #20000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
     interval = 5000 # 状態を保存する間隔
     episode = 20 # 評価のエピソード数

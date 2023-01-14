@@ -34,7 +34,7 @@ class ActorNet(nn.Module):
     
 class Actor():
   def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5) -> None:
-    self.tau = [-2, 2]
+    self.tau = (-2, 2)
         
     self.target_tau = target_tau
     self.c = c
@@ -46,27 +46,16 @@ class Actor():
     
     self.losses = []
     
-  def policy(self, states):
-    return self.net(states)
+  def policy(self, states, mode='n'):
+    net = self.net if mode!='t' else self.net_target
+    return net(states)
   
-  def target_policy(self, states):
-    return self.net_target(states)
-  
-  # Policy Smoothing Regularization
-  def policy_sr(self, states):
-    noises =  np.random.normal(0, self.sigma_sr)
-    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1).to(device)
-    policy_actions = self.net_target(states)
-    policy_actions = (policy_actions + noises).clip(*self.tau)
-    return policy_actions
-  # Target Policy Smoothing Regularization
-  def target_policy_sr(self, states):
-    noises =  np.random.normal(0, self.sigma_sr)
-    noises = torch.tensor(noises).clip(-self.c, self.c).view(-1,1).to(device)
-    policy_actions = self.net_target(states)
-    policy_actions = (policy_actions + noises).clip(*self.tau)
-    return policy_actions
-  
+  def policy_sr(self, states, mode='n'):
+    net = self.net if mode!='t' else self.net_target
+    noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
+    actions = net(states)
+    return (actions + noises).clip(*self.tau)
+
   def loss_optimize(self, states, critic, current_step):
     self.optimizer.zero_grad()
     policy_actions = self.policy(states)

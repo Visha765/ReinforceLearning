@@ -27,6 +27,7 @@ def Worker(d):
         os.mkdir('out')
     if not os.path.exists(path):
         os.mkdir(path)
+
     
     Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
     agent.plot_loss(interval=d.interval//1000, path=path)

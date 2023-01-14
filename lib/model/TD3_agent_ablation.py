@@ -90,8 +90,8 @@ class TD3Agent_withoutCDQ(TD3Agent):
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
-    #none of Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.target_policy_sr(next_states).to(device)
+    #Target Policy Smoothing Regularization
+    next_policy_actions = self.actor.policy_sr(next_states, mode='t').to(device)
     # without Clipped Double Q-Learning
     Q = self.critic1.estimate(next_states, next_policy_actions, mode='t')
     delta = Critic.delta(Q, rewards, dones_rev, self.gamma)

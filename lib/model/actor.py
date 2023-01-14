@@ -47,11 +47,15 @@ class Actor():
     self.losses = []
     
   def policy(self, states, mode='n'):
-    net = self.net if mode!='t' else self.net_target
+    i = 0 if mode!='t' else 1
+    net = (self.net, self.net_target)[i]
+    # net = self.net if mode!='t' else self.net_target
     return net(states)
   
   def policy_sr(self, states, mode='n'):
-    net = self.net if mode!='t' else self.net_target
+    i = 0 if mode!='t' else 1
+    net = (self.net, self.net_target)[i]
+    # net = self.net if mode!='t' else self.net_target
     noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
     actions = net(states)
     return (actions + noises).clip(*self.tau)

@@ -101,8 +101,8 @@ class TD3Agent(Agent):
   def plot_loss(self, interval, path):
     def plot(model):
       l = len(model.losses)
-      steps = [model.losses[i].loss for i in range(0, l, interval)]
-      losses = [model.losses[i].step for i in range(0, l, interval)]
+      losses = [model.losses[i].loss for i in range(0, l, interval)]
+      steps = [model.losses[i].step for i in range(0, l, interval)]
       LossPlot(losses, steps, model.__class__.__name__, path)
     plot(self.actor)
     plot(self.critic1)

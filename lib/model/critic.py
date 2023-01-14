@@ -46,9 +46,7 @@ class Critic():
     self.losses = []
     
   def estimate(self, states, actions, mode='n'):
-    i = 0 if mode!='t' else 1
-    net = (self.net, self.net_target)[i]
-    # net = self.net if mode!='t' else self.net_target
+    net = (self.net if mode!='t' else self.net_target).to(device)
     x = torch.cat([states, actions], dim=1)
     return net(x)
   

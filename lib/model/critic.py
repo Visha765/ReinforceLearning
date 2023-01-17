@@ -48,7 +48,7 @@ class Critic():
     
   def estimate(self, states, actions, mode='n'):
     x = torch.cat([states, actions], dim=1)
-    return self.net(states) if mode=='n' else self.net_target(states) 
+    return self.net(x) if mode=='n' else self.net_target(x) 
   
   def loss_optimize(self, states, actions, delta, current_step):
     self.optimizer.zero_grad()

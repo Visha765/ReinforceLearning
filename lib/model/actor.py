@@ -22,8 +22,8 @@ class ActorNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
         # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
@@ -33,12 +33,13 @@ class ActorNet(nn.Module):
     return y
     
 class Actor():
-  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5) -> None:
+  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=1000) -> None:
     self.tau = (-2, 2)
         
     self.target_tau = target_tau
     self.c = c
     self.sigma_sr = sigma_sr
+    self.interval = interval
     
     self.net = ActorNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
@@ -47,13 +48,11 @@ class Actor():
     self.losses = []
     
   def policy(self, states, mode='n'):
-    net = (self.net if mode!='t' else self.net_target).to(device)
-    return net(states)
+    return self.net(states) if mode=='n' else self.net_target(states) 
   
   def policy_sr(self, states, mode='n'):
-    net = (self.net if mode!='t' else self.net_target).to(device)
     noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
-    actions = net(states)
+    actions = self.net(states) if mode=='n' else self.net_target(states) 
     return (actions + noises).clip(*self.tau)
 
   def loss_optimize(self, states, critic, current_step):
@@ -61,9 +60,10 @@ class Actor():
     policy_actions = self.policy(states)
     Q = critic.estimate(states, policy_actions)
     loss = -Q.mean()
-    self.losses.append(Transition(loss.item(), current_step))
     loss.backward()
     self.optimizer.step()
+    if current_step % self.interval == 0:
+      self.losses.append(Transition(loss=loss.item(), step=current_step))
     
   def update_target_params(self):
     for target_param, param in zip(self.net_target.parameters(), self.net.parameters()):

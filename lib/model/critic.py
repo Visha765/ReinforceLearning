@@ -35,24 +35,25 @@ class CriticNet(nn.Module):
     return y
 
 class Critic():
-  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, interval=1000) -> None:
+  def __init__(self, dim_state, dim_action, lr=3*1e-4, target_tau=0.005, interval=1000):
     self.target_tau = target_tau
     self.interval = interval
     
     self.net = CriticNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
     self.criterion = nn.MSELoss()
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr, weight_decay=1e-2)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
     
     self.losses = []
     
   def estimate(self, states, actions, mode='n'):
+    net = (self.net if mode=='n' else self.net_target).to(device)
     x = torch.cat([states, actions], dim=1)
-    return self.net(x) if mode=='n' else self.net_target(x) 
+    return net(x)
   
   def loss_optimize(self, states, actions, delta, current_step):
     Q = self.estimate(states, actions)
-    loss = self.criterion(delta, Q)
+    loss = self.criterion(Q, delta)
     self.optimizer.zero_grad()
     loss.backward()
     self.optimizer.step()
@@ -67,5 +68,5 @@ class Critic():
   def delta(cls, Q, rewards, dones_rev, gamma = 0.99):
     with torch.no_grad():
       delta = rewards.view(-1,1) \
-        + torch.mul(dones_rev.view(-1,1), Q.view(-1,1)) * gamma
+        + dones_rev.view(-1,1) * Q.view(-1,1) * gamma
       return delta

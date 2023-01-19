@@ -33,7 +33,7 @@ class ActorNet(nn.Module):
     return y
     
 class Actor():
-  def __init__(self, dim_state, dim_action, sigma_lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=1000) -> None:
+  def __init__(self, dim_state, dim_action, lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=1000):
     self.tau = (-2, 2)
         
     self.target_tau = target_tau
@@ -43,25 +43,30 @@ class Actor():
     
     self.net = ActorNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
     
     self.losses = []
     
   def policy(self, states, mode='n'):
-    return self.net(states) if mode=='n' else self.net_target(states) 
+    net = (self.net if mode=='n' else self.net_target).to(device)
+    return net(states)
   
   def policy_sr(self, states, mode='n'):
     noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
-    actions = (self.net(states) if mode=='n' else self.net_target(states) ).to(device)
+    actions = self.policy(states, mode=mode)
     return (actions + noises).clip(*self.tau)
 
   def loss_optimize(self, states, critic, current_step):
-    policy_actions = self.net(states)
-    Q = critic.estimate(states, policy_actions)
+    actions = self.policy(states)
+    Q = critic.estimate(states, actions)
     loss = -Q.mean()
     self.optimizer.zero_grad()
     loss.backward()
     self.optimizer.step()
+    # lr = 3 * 1e-4
+    # for param in self.net.parameters():
+    #   param.data.copy_(param.data + lr * param.grad.data)
+
     if current_step % self.interval == 0:
       self.losses.append(Transition(loss=loss.item(), step=current_step))
     

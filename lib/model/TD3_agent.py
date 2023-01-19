@@ -8,7 +8,7 @@ from lib.model.critic import Critic
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class TD3Agent(ACAgent):
-  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
+  def __init__(self, buffer_size, batch_size, lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
 
@@ -20,9 +20,9 @@ class TD3Agent(ACAgent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     dim_state, dim_action = 2, 1
-    self.actor = Actor(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
-    self.critic1 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
-    self.critic2 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.actor = Actor(dim_state, dim_action, lr=lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
+    self.critic1 = Critic(dim_state, dim_action, lr=lr, target_tau=target_tau)
+    self.critic2 = Critic(dim_state, dim_action, lr=lr, target_tau=target_tau)
     
 
   def train(self, state, action, next_state, reward, done, current_step):

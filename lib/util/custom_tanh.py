@@ -1,5 +1,4 @@
 import torch, torch.nn as nn
-import numpy as np
 
 a_min, a_max = (-2, 2)
 

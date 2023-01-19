@@ -83,7 +83,7 @@ class ACAgent(Agent):
     dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
     return states, actions, next_states, rewards, dones_rev
   
-  def plot(model, path):
+  def plot(self, model, path):
     losses = [i.loss for i in model.losses]
     steps = [i.step for i in model.losses]
     LossPlot(losses, steps, model.__class__.__name__, path)

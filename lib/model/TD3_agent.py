@@ -1,18 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import sys, os
-import torch, torch.nn as nn
+import torch
 
-from lib.model.agent import Agent
+from lib.model.ac_agent import ACAgent
 from lib.model.replay_buffer import ReplayBuffer
 from lib.model.actor import Actor
 from lib.model.critic import Critic
-from lib.util.xy2theta import xy2theta
-from lib.util.loss_plot import LossPlot
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class TD3Agent(Agent):
+class TD3Agent(ACAgent):
   def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
@@ -29,32 +24,6 @@ class TD3Agent(Agent):
     self.critic1 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
     self.critic2 = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
     
-
-  def save_models(self, current_step, path):
-    filename = f"log_step{current_step}.pth"
-    model_path = os.path.join(path, filename)
-    model = self.actor.net
-    torch.save(model.to('cpu').state_dict(), model_path)
-
-  def load_models(self, path, saved_step):
-    filename = f"log_step{saved_step}.pth"
-    model_path = os.path.join(path, filename)
-    model = self.actor.net
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-
-  def select_action(self, state):
-    state = xy2theta(state)
-    states = self.list2tensor([state,])
-    return self.actor.policy(states)[0].detach().cpu().numpy() #tensor -> ndarray
-  
-  def select_exploratory_action(self, state, current_step):
-    if current_step < self.T_expl:
-      return np.random.uniform(*self.tau, 1)
-    
-    action = self.select_action(state)
-    D = (self.tau[1] - self.tau[0]) * self.sigma_beta/2
-    noise = np.random.normal(0, D**2)
-    return np.clip(action + noise, *self.tau)
 
   def train(self, state, action, next_state, reward, done, current_step):
     self.add_buffer(state, action, next_state, reward, done)
@@ -79,32 +48,9 @@ class TD3Agent(Agent):
       self.actor.update_target_params()
       self.critic1.update_target_params()
       self.critic2.update_target_params()
-    
   
-  def list2tensor(self, x):
-    x = np.array(x, dtype=np.float32)
-    return torch.Tensor(x).to(device)
-  
-  def add_buffer(self, state, action, next_state, reward, done):
-    # add exp into buffer
-    state = xy2theta(state)
-    next_state = xy2theta(next_state)
-    self.buffer.add(state, action, next_state, reward, done)
-    
-  def sample_buffer(self):
-    # sample exp arrays from buffer
-    if (len(self.buffer)) < self.batch_size: raise
-    states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
-    dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
-    return states, actions, next_states, rewards, dones_rev
-    
-  def plot_loss(self, interval, path):
-    def plot(model):
-      l = len(model.losses)
-      losses = [model.losses[i].loss for i in range(0, l, interval)]
-      steps = [model.losses[i].step for i in range(0, l, interval)]
-      LossPlot(losses, steps, model.__class__.__name__, path)
-    plot(self.actor)
-    plot(self.critic1)
+  def plot_loss(self, path):
+    self.plot(self.actor, path)
+    self.plot(self.critic1, path)
     
 

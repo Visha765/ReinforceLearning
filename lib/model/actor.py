@@ -22,8 +22,8 @@ class ActorNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
         # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
@@ -52,14 +52,14 @@ class Actor():
   
   def policy_sr(self, states, mode='n'):
     noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
-    actions = self.net(states) if mode=='n' else self.net_target(states) 
+    actions = (self.net(states) if mode=='n' else self.net_target(states) ).to(device)
     return (actions + noises).clip(*self.tau)
 
   def loss_optimize(self, states, critic, current_step):
-    self.optimizer.zero_grad()
-    policy_actions = self.policy(states)
+    policy_actions = self.net(states)
     Q = critic.estimate(states, policy_actions)
     loss = -Q.mean()
+    self.optimizer.zero_grad()
     loss.backward()
     self.optimizer.step()
     if current_step % self.interval == 0:

@@ -24,8 +24,8 @@ class CriticNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
+        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
         # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
@@ -42,7 +42,7 @@ class Critic():
     self.net = CriticNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
     self.criterion = nn.MSELoss()
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=sigma_lr, weight_decay=1e-2)
     
     self.losses = []
     
@@ -51,9 +51,9 @@ class Critic():
     return self.net(x) if mode=='n' else self.net_target(x) 
   
   def loss_optimize(self, states, actions, delta, current_step):
-    self.optimizer.zero_grad()
     Q = self.estimate(states, actions)
     loss = self.criterion(delta, Q)
+    self.optimizer.zero_grad()
     loss.backward()
     self.optimizer.step()
     if current_step % self.interval == 0:

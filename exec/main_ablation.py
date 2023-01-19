@@ -24,7 +24,7 @@ class params:
   train_seed = None # 学習環境のseed値
   interval = 1000 # 状態を保存する間隔
   episode = 50 # 評価のエピソード数
-  eval_step = 10000 # 評価最大ステップ数
+  eval_step = 100000 # 評価最大ステップ数
   eval_seed = 0 # 評価環境のseed値
 
   buffer_size = train_step

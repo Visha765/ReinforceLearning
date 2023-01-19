@@ -12,7 +12,7 @@ from lib.util.loss_plot import LossPlot
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class ACAgent(Agent):
-  def __init__(self, buffer_size, batch_size, sigma_lr=3*1e-4, \
+  def __init__(self, buffer_size, batch_size, lr=3*1e-4, \
     gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.tau = (-2, 2)
 
@@ -24,8 +24,8 @@ class ACAgent(Agent):
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
     dim_state, dim_action = 2, 1
-    self.actor = Actor(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
-    self.critic = Critic(dim_state, dim_action, sigma_lr=sigma_lr, target_tau=target_tau)
+    self.actor = Actor(dim_state, dim_action, lr=lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
+    self.critic = Critic(dim_state, dim_action, lr=lr, target_tau=target_tau)
     
 
   def save_models(self, current_step, path):

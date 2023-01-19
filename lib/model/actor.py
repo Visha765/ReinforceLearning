@@ -22,9 +22,9 @@ class ActorNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
-        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.normal_(m.weight, 0, 0.01)
+        nn.init.kaiming_uniform_(m.weight, mode="fan_in", nonlinearity="relu")
+    #     # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+    #     # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
   def forward(self, x):
@@ -58,14 +58,10 @@ class Actor():
 
   def loss_optimize(self, states, critic, current_step):
     actions = self.policy(states)
-    Q = critic.estimate(states, actions)
-    loss = -Q.mean()
+    loss = -critic.estimate(states, actions).mean()
     self.optimizer.zero_grad()
     loss.backward()
     self.optimizer.step()
-    # lr = 3 * 1e-4
-    # for param in self.net.parameters():
-    #   param.data.copy_(param.data + lr * param.grad.data)
 
     if current_step % self.interval == 0:
       self.losses.append(Transition(loss=loss.item(), step=current_step))

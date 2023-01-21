@@ -20,7 +20,7 @@ class params:
   env_name = "Pendulum-v0" # 環境名
   agent_name = None # エージェント名
   dir_name = None # 保存先ディレクトリ
-  train_step = 100000 # 学習最大ステップ
+  train_step = 257 # 学習最大ステップ
   train_seed = None # 学習環境のseed値
   interval = 1000 # 状態を保存する間隔
   episode = 30 # 評価のエピソード数
@@ -36,22 +36,22 @@ class params:
     self.train_seed = train_seed
     self.dir_name = f"{self.env_name}_{self.agent_name}_{self.train_seed}" # 保存先ディレクトリ
       
-  def agent(self):
+  def agent(self, env):
     pass
   
   
 class params_TD3(params):
   agent_name = "TD3"
-  def agent(self):
-    return TD3Agent(self.buffer_size, self.batch_size, target_tau=self.target_tau)
+  def agent(self, env):
+    return TD3Agent(env, self.buffer_size, self.batch_size, target_tau=self.target_tau)
   
 options = ["TATC", "TPSR", "DPU", "CDQ"]
 for option in options:
   exec(f"""
 class params_TD3_without{option}(params):
   agent_name = "TD3-{option}"
-  def agent(self):
-    return TD3Agent_without{option}(self.buffer_size, self.batch_size, target_tau=self.target_tau)
+  def agent(self, env):
+    return TD3Agent_without{option}(env, self.buffer_size, self.batch_size, target_tau=self.target_tau)
   """)
 
 train_seeds = [11, 13, 17, 19, 23]

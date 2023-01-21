@@ -63,9 +63,3 @@ class Critic():
   def update_target_params(self):
     for target_param, param in zip(self.net_target.parameters(), self.net.parameters()):
       target_param.data.copy_(target_param.data * (1.0 - self.target_tau) + param.data * self.target_tau)
-  
-  @classmethod
-  def delta(cls, Q, rewards, dones_rev, gamma = 0.99):
-    with torch.no_grad():
-      delta = rewards.view(-1,1) + dones_rev.view(-1,1) * Q.view(-1,1) * gamma
-      return delta

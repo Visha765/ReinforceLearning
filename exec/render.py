@@ -10,7 +10,7 @@ step = sys.argv[2]
 
 env = gym.make("Pendulum-v0")
 agent = TD3Agent(0,0)
-agent.load_models(saved_step=step, path=f"out/Pendulum-v0_TD3_{seed}")
+agent.load_models(saved_step=step, path=f"out\Pendulum-v0_TD3_{seed}")
 
 for it in range(episode):
   state = env.reset()

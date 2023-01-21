@@ -15,7 +15,7 @@ def Worker(d):
     print('-'*10, "start Train", d.agent_name, d.train_seed, '-'*10)
     
     env = gym.make(d.env_name)
-    agent = d.agent()
+    agent = d.agent(env)
     env.seed(d.train_seed)
     np.random.seed(d.train_seed)
     random.seed(d.train_seed)
@@ -30,7 +30,7 @@ def Worker(d):
         os.mkdir(path)
 
     
-    # Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
+    Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
     env.close()
     
 
@@ -47,5 +47,7 @@ def Worker(d):
         env.close()
     with open(f"{path}/rewards_{d.train_seed}.pkl", 'wb') as f:
         pickle.dump(rewards_list, f)
+    # with open(f"{path}/rewards_{d.train_seed}.pkl", 'rb') as f:
+    #     rewards_list = pickle.load(f)
     return rewards_list
 

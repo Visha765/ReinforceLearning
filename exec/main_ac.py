@@ -7,7 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from lib.training.worker import Worker
 from lib.util.transform import Transform
 from lib.util.line_plot import LinePlot
-from lib.model.ac_agent import ACAgent
+from lib.model.actor_critic_agent import ActorCriticAgent
 
 if multiprocessing.get_start_method() == 'fork':
     multiprocessing.set_start_method('spawn', force=True)
@@ -33,8 +33,8 @@ class params:
         self.train_seed = train_seed
         self.dir_name = f"{self.env_name}_{self.agent_name}_{self.train_seed}" # 保存先ディレクトリ
         
-    def agent(self):
-        return ACAgent(self.buffer_size, self.batch_size)
+    def agent(self, env):
+        return ActorCriticAgent(env, self.buffer_size, self.batch_size)
     
 train_seeds = [11, 13, 17, 19, 23]
 # train_seeds = [11]

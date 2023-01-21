@@ -33,8 +33,8 @@ class ActorNet(nn.Module):
     return y
     
 class Actor():
-  def __init__(self, dim_state, dim_action, lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=500):
-    self.tau = (-2, 2)
+  def __init__(self, dim_state, dim_action, action_space, lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=500):
+    self.action_space = action_space
         
     self.target_tau = target_tau
     self.c = c
@@ -52,9 +52,11 @@ class Actor():
     return net(states)
   
   def policy_sr(self, states, mode='n'):
-    noises = torch.normal(0, self.sigma_sr, (1,)).clip(-self.c, self.c).view(-1,1).to(device)
+    noises = torch.normal(0, self.sigma_sr, self.action_space.shape).clip(-self.c, self.c).view(-1,self.action_space.shape[0]).to(device)
     actions = self.policy(states, mode=mode)
-    return (actions + noises).clip(*self.tau)
+    # return (actions + noises).clip(self.action_space.low, self.action_space.high)
+    return (actions + noises) \
+      .clip(*[torch.tensor(i).to(device) for i in (self.action_space.low, self.action_space.high)])
 
   def loss_optimize(self, states, critic, current_step):
     actions = self.policy(states)

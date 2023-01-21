@@ -11,10 +11,12 @@ from lib.util.loss_plot import LossPlot
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class ACAgent(Agent):
-  def __init__(self, buffer_size, batch_size, lr=3*1e-4, \
-    gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
-    self.tau = (-2, 2)
+class ActorCriticAgent(Agent):
+  def __init__(self, env, buffer_size, batch_size, lr=3*1e-4, \
+      gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
+    self.action_space = env.action_space
+    self.dim_state = env.observation_space.shape[0]-1
+    self.dim_action = env.action_space.shape[0]
 
     self.actor_interval = actor_interval
     self.sigma_beta = sigma_beta
@@ -23,10 +25,9 @@ class ACAgent(Agent):
     
     self.batch_size = batch_size
     self.buffer = ReplayBuffer(buffer_size)
-    dim_state, dim_action = 2, 1
-    self.actor = Actor(dim_state, dim_action, lr=lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
-    self.critic = Critic(dim_state, dim_action, lr=lr, target_tau=target_tau)
     
+    self.actor = Actor(self.dim_state, self.dim_action, self.action_space, lr=lr, target_tau=target_tau, sigma_sr=sigma_sr, c=c)
+    self.critic = Critic(self.dim_state, self.dim_action, lr=lr, target_tau=target_tau)  
 
   def save_models(self, current_step, path):
     filename = f"log_step{current_step}.pth"
@@ -47,16 +48,16 @@ class ACAgent(Agent):
   
   def select_exploratory_action(self, state, current_step):
     if current_step < self.T_expl:
-      return np.random.uniform(*self.tau, 1)
+      return np.random.uniform(self.action_space.low, self.action_space.high)
     
     action = self.select_action(state)
-    D = (self.tau[1] - self.tau[0]) * self.sigma_beta/2
+    D = (self.action_space.high - self.action_space.low) / 2 * self.sigma_beta
     noise = np.random.normal(0, D**2)
-    return np.clip(action + noise, *self.tau)
-
+    return np.clip(action + noise, self.action_space.low, self.action_space.high)
+  
   def train(self, state, action, next_state, reward, done, current_step):
     self.add_buffer(state, action, next_state, reward, done)
-    if (len(self.buffer)) < self.batch_size: return # skip
+    if (len(self.buffer)) < self.batch_size: return None # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
 
     next_policy_actions = self.actor.policy(next_states)
@@ -65,6 +66,10 @@ class ACAgent(Agent):
     self.critic.loss_optimize(states, actions, delta, current_step)
     self.actor.loss_optimize(states, self.critic, current_step)
     
+  def delta(self, Q, rewards, dones_rev, gamma):
+    with torch.no_grad():
+      delta = rewards.view(-1, self.dim_action) + dones_rev.view(-1, self.dim_action) * Q.view(-1, self.dim_action) * gamma
+      return delta
   
   def list2tensor(self, x):
     x = np.array(x, dtype=np.float32)
@@ -86,10 +91,9 @@ class ACAgent(Agent):
   def plot(self, model, path):
     losses = [i.loss for i in model.losses]
     steps = [i.step for i in model.losses]
-    LossPlot(losses, steps, model.__class__.__name__, path)
+    filename = f"{model.__class__.__name__}_loss.png"
+    LossPlot(losses, steps, filename, path)
     
   def plot_loss(self, path):
     self.plot(self.actor, path)
     self.plot(self.critic, path)
-    
-

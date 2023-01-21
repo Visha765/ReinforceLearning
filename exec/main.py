@@ -19,17 +19,17 @@ class params:
     env_name = "Pendulum-v0" # 環境名
     agent_name = "TD3" # エージェント名
     dir_name = None # 保存先ディレクトリ
-    train_step = 20000 # 学習最大ステップ
+    train_step = 100000 # 学習最大ステップ
     train_seed = None # 学習環境のseed値
-    interval = 500 # 状態を保存する間隔
-    episode = 10 # 評価のエピソード数
-    eval_step = 100000 # 評価最大ステップ数
+    interval = 1000 # 状態を保存する間隔
+    episode = 30 # 評価のエピソード数
+    eval_step = 10000 # 評価最大ステップ数
     eval_seed = 0 # 評価環境のseed値
 
     buffer_size = train_step
     batch_size = 256
     
-    tau = 0.05 # target networkの更新率
+    tau = 0.03 # target networkの更新率
     
     def __init__(self, train_seed):
         self.train_seed = train_seed
@@ -38,8 +38,8 @@ class params:
     def agent(self):
         return TD3Agent(self.buffer_size, self.batch_size, target_tau=self.tau)
     
+# train_seeds = [100, 200, 300, 400, 500]
 train_seeds = [11, 13, 17, 19, 23]
-# train_seeds = [11]
 condition = [params(train_seed) for train_seed in train_seeds]
 
 if __name__ == '__main__':

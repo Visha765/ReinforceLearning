@@ -2,6 +2,7 @@ import numpy as np
 import random
 import sys, os
 import torch
+import pickle
 import gym
 from tqdm import tqdm
 
@@ -29,8 +30,7 @@ def Worker(d):
         os.mkdir(path)
 
     
-    Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
-    agent.plot_loss(path=path)
+    # Train(env=env, agent=agent, end_step=d.train_step, interval=d.interval, path=path)
     env.close()
     
 
@@ -45,5 +45,7 @@ def Worker(d):
         rewards = Evaluate(env=env, agent=agent, max_step=d.eval_step, episode=d.episode)
         rewards_list.append(rewards) 
         env.close()
+    with open(f"{path}/rewards_{d.train_seed}.pkl", 'wb') as f:
+        pickle.dump(rewards_list, f)
     return rewards_list
 

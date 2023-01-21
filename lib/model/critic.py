@@ -34,14 +34,14 @@ class CriticNet(nn.Module):
     return y
 
 class Critic():
-  def __init__(self, dim_state, dim_action, lr=3*1e-4, target_tau=0.005, interval=1000):
+  def __init__(self, dim_state, dim_action, lr=3*1e-4, target_tau=0.005, interval=500):
     self.target_tau = target_tau
     self.interval = interval
     
     self.net = CriticNet(dim_state, dim_action).to(device)
     self.net_target = copy.deepcopy(self.net).to(device)
     self.criterion = nn.MSELoss()
-    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr, weight_decay=1e-2)
+    self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
     
     self.losses = []
     

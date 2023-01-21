@@ -46,7 +46,7 @@ class TD3Agent_withoutTPSR(TD3Agent):
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
     #without Target Policy Smoothing Regularization
-    next_policy_actions = self.actor.policy(next_states, mode='t').to(device)
+    next_policy_actions = self.actor.policy(next_states, mode='t')
     # Clipped Double Q-Learning
     Q1 = self.critic1.estimate(next_states, next_policy_actions, mode='t')
     Q2 = self.critic2.estimate(next_states, next_policy_actions, mode='t')

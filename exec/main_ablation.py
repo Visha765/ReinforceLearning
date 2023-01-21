@@ -23,12 +23,14 @@ class params:
   train_step = 100000 # 学習最大ステップ
   train_seed = None # 学習環境のseed値
   interval = 1000 # 状態を保存する間隔
-  episode = 50 # 評価のエピソード数
+  episode = 30 # 評価のエピソード数
   eval_step = 100000 # 評価最大ステップ数
   eval_seed = 0 # 評価環境のseed値
 
   buffer_size = train_step
   batch_size = 256
+  
+  target_tau = 0.05 # target networkの更新率
   
   def __init__(self, train_seed):
     self.train_seed = train_seed
@@ -41,7 +43,7 @@ class params:
 class params_TD3(params):
   agent_name = "TD3"
   def agent(self):
-    return TD3Agent(self.buffer_size, self.batch_size)
+    return TD3Agent(self.buffer_size, self.batch_size, target_tau=self.target_tau)
   
 options = ["TATC", "TPSR", "DPU", "CDQ"]
 for option in options:
@@ -49,7 +51,7 @@ for option in options:
 class params_TD3_without{option}(params):
   agent_name = "TD3-{option}"
   def agent(self):
-    return TD3Agent_without{option}(self.buffer_size, self.batch_size)
+    return TD3Agent_without{option}(self.buffer_size, self.batch_size, target_tau=self.target_tau)
   """)
 
 train_seeds = [11, 13, 17, 19, 23]

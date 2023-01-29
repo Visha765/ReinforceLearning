@@ -1,7 +1,7 @@
 import torch
 
-from lib.model.critic import Critic
 from lib.model.actor_critic_agent import ActorCriticAgent
+from lib.model.critic import Critic
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 

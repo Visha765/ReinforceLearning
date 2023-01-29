@@ -5,6 +5,7 @@ import torch.nn as nn
 import copy
 
 from lib.util.custom_tanh import *
+from lib.util.list2tensor import list2tensor
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 Transition = namedtuple('Transition', ('loss', 'step'))
@@ -20,12 +21,12 @@ class ActorNet(nn.Module):
       Lambda(custom_tanh.apply)
     )
     
-    for m in self.modules():
-      if isinstance(m, nn.Linear):
-        # nn.init.kaiming_uniform_(m.weight, mode="fan_out", nonlinearity="relu")
-        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-    #     # nn.init.normal_(m.weight, 0, 0.01)
-        nn.init.constant_(m.bias, 0)
+    # for m in self.modules():
+    #   if isinstance(m, nn.Linear):
+        # nn.init.kaiming_uniform_(m.weight, mode="fan_in", nonlinearity="relu")
+        # nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        # nn.init.normal_(m.weight, 0, 0.01)
+        # nn.init.constant_(m.bias, 0)
 
   def forward(self, x):
     x = self.flatten(x)
@@ -52,11 +53,11 @@ class Actor():
     return net(states)
   
   def policy_sr(self, states, mode='n'):
-    noises = torch.normal(0, self.sigma_sr, self.action_space.shape).clip(-self.c, self.c).view(-1,self.action_space.shape[0]).to(device)
+    noises = torch.normal(0, self.sigma_sr, self.action_space.shape) \
+      .clip(-self.c, self.c).view(-1,self.action_space.shape[0]).to(device)
     actions = self.policy(states, mode=mode)
-    # return (actions + noises).clip(self.action_space.low, self.action_space.high)
     return (actions + noises) \
-      .clip(*[torch.tensor(i).to(device) for i in (self.action_space.low, self.action_space.high)])
+      .clip(list2tensor(self.action_space.low), list2tensor(self.action_space.high))
 
   def loss_optimize(self, states, critic, current_step):
     actions = self.policy(states)

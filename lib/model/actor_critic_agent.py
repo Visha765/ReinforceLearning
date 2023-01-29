@@ -6,8 +6,8 @@ from lib.model.agent import Agent
 from lib.model.replay_buffer import ReplayBuffer
 from lib.model.actor import Actor
 from lib.model.critic import Critic
-from lib.util.xy2theta import xy2theta
 from lib.util.loss_plot import LossPlot
+from lib.util.list2tensor import list2tensor
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -15,7 +15,9 @@ class ActorCriticAgent(Agent):
   def __init__(self, env, buffer_size, batch_size, lr=3*1e-4, \
       gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.action_space = env.action_space
-    self.dim_state = env.observation_space.shape[0]-1
+    self.dim_state = env.observation_space.shape[0]
+    if env.unwrapped.spec.id == 'Pendulum-v0': 
+      self.dim_state -= 1
     self.dim_action = env.action_space.shape[0]
 
     self.actor_interval = actor_interval
@@ -42,8 +44,8 @@ class ActorCriticAgent(Agent):
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 
   def select_action(self, state):
-    state = xy2theta(state)
-    states = self.list2tensor([state,])
+    state = self.transform_state(state)
+    states = list2tensor([state,])
     return self.actor.policy(states)[0].detach().cpu().numpy() #tensor -> ndarray
   
   def select_exploratory_action(self, state, current_step):
@@ -68,30 +70,31 @@ class ActorCriticAgent(Agent):
     
   def delta(self, Q, rewards, dones_rev, gamma):
     with torch.no_grad():
-      delta = rewards.view(-1, self.dim_action) + dones_rev.view(-1, self.dim_action) * Q.view(-1, self.dim_action) * gamma
+      delta = rewards.view(-1, 1) + dones_rev.view(-1, 1) * Q.view(-1, 1) * gamma
       return delta
   
-  def list2tensor(self, x):
-    x = np.array(x, dtype=np.float32)
-    return torch.Tensor(x).to(device)
+  def transform_state(self, state):
+    cos, sin = state[0:2]
+    theta = np.arccos(cos) if sin > 0 else -np.arccos(cos)
+    return (theta, state[2])
   
   def add_buffer(self, state, action, next_state, reward, done):
     # add exp into buffer
-    state = xy2theta(state)
-    next_state = xy2theta(next_state)
+    state = self.transform_state(state)
+    next_state = self.transform_state(next_state)
     self.buffer.add(state, action, next_state, reward, done)
     
   def sample_buffer(self):
     # sample exp arrays from buffer
     if (len(self.buffer)) < self.batch_size: raise
-    states, actions, next_states, rewards, dones = [self.list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
-    dones_rev = self.list2tensor(list(map(lambda x: not x, dones)))  
+    states, actions, next_states, rewards, dones = [list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
+    dones_rev = list2tensor(list(map(lambda x: not x, dones)))  
     return states, actions, next_states, rewards, dones_rev
   
   def plot(self, model, path):
     losses = [i.loss for i in model.losses]
     steps = [i.step for i in model.losses]
-    filename = f"{model.__class__.__name__}_loss.png"
+    filename = f"{model.__class__.__name__}_loss"
     LossPlot(losses, steps, filename, path)
     
   def plot_loss(self, path):

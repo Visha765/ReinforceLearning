@@ -14,3 +14,4 @@ def LossPlot(data_list, x, filename, path):
   
   plt.savefig(os.path.join(path, filename)+'.png', format="png")
   # plt.show()
+  plt.close()

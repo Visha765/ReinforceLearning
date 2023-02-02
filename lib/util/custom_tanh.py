@@ -1,6 +1,13 @@
 import torch, torch.nn as nn
+import gym
 
-a_min, a_max = (-2, 2)
+from lib.util.list2tensor import list2tensor
+
+# env_name = "Pendulum-v0"
+env_name = "BipedalWalker-v3"
+env = gym.make(env_name)
+a_min = list2tensor(env.action_space.low)
+a_max = list2tensor(env.action_space.high)
 
 def d_tanh(x): 
     return 1 / (x.cosh() ** 2)
@@ -21,7 +28,7 @@ class custom_tanh(torch.autograd.Function):
         return dL_dx
 
 # wrapper
-class Lambda(nn.Module):
+class wrapper(nn.Module):
     def __init__(self, func):
         super().__init__()
         self.func = func

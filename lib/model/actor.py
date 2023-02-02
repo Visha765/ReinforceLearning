@@ -18,7 +18,7 @@ class ActorNet(nn.Module):
       nn.Linear(dim_state, hidden1_size),
       nn.ReLU(),
       nn.Linear(hidden1_size, dim_action),
-      Lambda(custom_tanh.apply)
+      wrapper(custom_tanh.apply)
     )
     
     # for m in self.modules():

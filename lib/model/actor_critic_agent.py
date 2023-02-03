@@ -16,8 +16,6 @@ class ActorCriticAgent(Agent):
       gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
     self.action_space = env.action_space
     self.dim_state = env.observation_space.shape[0]
-    if env.unwrapped.spec.id == 'Pendulum-v0': 
-      self.dim_state -= 1
     self.dim_action = env.action_space.shape[0]
 
     self.actor_interval = actor_interval
@@ -44,7 +42,6 @@ class ActorCriticAgent(Agent):
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 
   def select_action(self, state):
-    state = self.transform_state(state)
     states = list2tensor([state,])
     return self.actor.policy(states)[0].detach().cpu().numpy() #tensor -> ndarray
   
@@ -58,7 +55,7 @@ class ActorCriticAgent(Agent):
     return np.clip(action + noise, self.action_space.low, self.action_space.high)
   
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return None # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
 
@@ -72,20 +69,8 @@ class ActorCriticAgent(Agent):
     with torch.no_grad():
       delta = rewards.view(-1, 1) + dones_rev.view(-1, 1) * Q.view(-1, 1) * gamma
       return delta
-  
-  def transform_state(self, state):
-    cos, sin = state[0:2]
-    theta = np.arccos(cos) if sin > 0 else -np.arccos(cos)
-    return (theta, state[2])
-  
-  def add_buffer(self, state, action, next_state, reward, done):
-    # add exp into buffer
-    state = self.transform_state(state)
-    next_state = self.transform_state(next_state)
-    self.buffer.add(state, action, next_state, reward, done)
     
   def sample_buffer(self):
-    # sample exp arrays from buffer
     if (len(self.buffer)) < self.batch_size: raise
     states, actions, next_states, rewards, dones = [list2tensor(lst) for lst in self.buffer.sample(self.batch_size)]
     dones_rev = list2tensor(list(map(lambda x: not x, dones)))  

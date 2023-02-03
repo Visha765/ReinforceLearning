@@ -3,8 +3,8 @@ import gym
 
 from lib.util.list2tensor import list2tensor
 
-# env_name = "Pendulum-v0"
-env_name = "BipedalWalker-v3"
+env_name = "Pendulum-v0"
+# env_name = "BipedalWalker-v3"
 env = gym.make(env_name)
 a_min = list2tensor(env.action_space.low)
 a_max = list2tensor(env.action_space.high)

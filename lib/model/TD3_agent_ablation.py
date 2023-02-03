@@ -14,7 +14,7 @@ class TD3Agent_withoutTATC(ActorCriticAgent):
     self.critic2 = Critic(self.dim_state, self.dim_action, lr=lr, target_tau=target_tau)
     
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
@@ -43,7 +43,7 @@ class TD3Agent_withoutTPSR(ActorCriticAgent):
     self.critic2 = Critic(self.dim_state, self.dim_action, lr=lr, target_tau=target_tau)
     
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
@@ -77,7 +77,7 @@ class TD3Agent_withoutDPU(ActorCriticAgent):
     
     
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     
@@ -108,7 +108,7 @@ class TD3Agent_withoutCDQ(ActorCriticAgent):
         gamma=gamma, sigma_beta=sigma_beta, T_expl=T_expl, target_tau=target_tau, actor_interval=actor_interval, sigma_sr=sigma_sr, c=c)
     
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     

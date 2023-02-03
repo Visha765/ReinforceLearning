@@ -30,7 +30,7 @@ class params:
   buffer_size = train_step
   batch_size = 256
   
-  target_tau = 0.03 # target networkの更新率
+  target_tau = 0.01 # target networkの更新率
   
   def __init__(self, train_seed):
     self.train_seed = train_seed

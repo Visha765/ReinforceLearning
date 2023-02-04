@@ -16,7 +16,7 @@ if multiprocessing.get_start_method() == 'fork':
 ### Condition ###
 @dataclass
 class params:
-    env_name = "BipedalWalker-v3" # 環境名
+    env_name = "HumanoidBulletEnv-v0" # 環境名
     agent_name = "TD3" # エージェント名
     dir_name = None # 保存先ディレクトリ
     train_step = 100000 # 学習最大ステップ
@@ -29,11 +29,10 @@ class params:
     buffer_size = train_step
     batch_size = 256
     
-    lr = 3*1e-1 # 学習率
+    lr = 0.3 # 学習率
     tau = 0.005  # target networkの更新率
     sigma_sr = 0.1 # srの標準偏差
     c = 0.3
-    actor_interval = 2
     
     def __init__(self, train_seed):
         self.train_seed = train_seed

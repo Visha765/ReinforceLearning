@@ -23,7 +23,7 @@ class params:
   train_step = 100000 # 学習最大ステップ
   train_seed = None # 学習環境のseed値
   interval = 1000 # 状態を保存する間隔
-  episode = 30 # 評価のエピソード数
+  episode = 10 # 評価のエピソード数
   eval_step = 100000 # 評価最大ステップ数
   eval_seed = 0 # 評価環境のseed値
 
@@ -46,6 +46,7 @@ class params_TD3(params):
     return TD3Agent(env, self.buffer_size, self.batch_size, target_tau=self.target_tau)
   
 options = ["TATC", "TPSR", "DPU", "CDQ"]
+# options = ["CDQ"]
 for option in options:
   exec(f"""
 class params_TD3_without{option}(params):
@@ -73,9 +74,10 @@ if __name__ == '__main__':
     data_list.append(data)
 
   ### Visuallize ###
-  label_list = ["origin"] + options
+  label_list = ["TD3"] + [f"TD3 without {option}" for option in options]
   saved_steps = [i for i in range(0, params.train_step+1, params.interval)]
-  filename = "TD3-comp"
+  filename = "TD3-comp10"
+  # filename = f"TD3-{options[0]}"
   LinePlot(data_list=data_list, label_list=label_list, x=saved_steps,
           filename=filename, path="out")
 

@@ -102,11 +102,6 @@ class TD3Agent_withoutDPU(ActorCriticAgent):
 
 # Agent without Clipped Double Q-Learning
 class TD3Agent_withoutCDQ(ActorCriticAgent):
-  def __init__(self, env, buffer_size, batch_size, lr=3*1e-4, \
-      gamma=0.99, sigma_beta=0.1, T_expl=10000, target_tau=0.005, actor_interval=2, sigma_sr=0.2, c=0.5):
-    super().__init__(env, buffer_size, batch_size, lr=lr, \
-        gamma=gamma, sigma_beta=sigma_beta, T_expl=T_expl, target_tau=target_tau, actor_interval=actor_interval, sigma_sr=sigma_sr, c=c)
-    
   def train(self, state, action, next_state, reward, done, current_step):
     self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip

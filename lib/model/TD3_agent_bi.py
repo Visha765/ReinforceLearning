@@ -16,7 +16,7 @@ class TD3Agent(ActorCriticAgent):
     return state
 
   def train(self, state, action, next_state, reward, done, current_step):
-    self.add_buffer(state, action, next_state, reward, done)
+    self.buffer.add(state, action, next_state, reward, done)
     if (len(self.buffer)) < self.batch_size: return # skip
     states, actions, next_states, rewards, dones_rev = self.sample_buffer()
     

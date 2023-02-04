@@ -23,9 +23,7 @@ class ActorNet(nn.Module):
     
     for m in self.modules():
       if isinstance(m, nn.Linear):
-        # nn.init.kaiming_uniform_(m.weight, mode="fan_in", nonlinearity="relu")
         nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-        # nn.init.normal_(m.weight, 0, 0.01)
         nn.init.constant_(m.bias, 0)
 
   def forward(self, x):
@@ -36,7 +34,6 @@ class ActorNet(nn.Module):
 class Actor():
   def __init__(self, dim_state, dim_action, action_space, lr=3*1e-4, target_tau=0.005, sigma_sr=0.2, c=0.5, interval=500):
     self.action_space = action_space
-        
     self.target_tau = target_tau
     self.c = c
     self.sigma_sr = sigma_sr
